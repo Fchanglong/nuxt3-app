@@ -351,7 +351,7 @@ const cartCount = ref(0);
   top: 0;
   left: 0;
   right: 0;
-  background: #1c2b3c;     /* 深夜蓝色背景（可根据官网实际稍作微调） */
+  background: #191919;     /* 深夜蓝色背景（可根据官网实际稍作微调） */
   z-index: 999;
   border-bottom: 1px solid #273742; /* 深一点的分隔线 */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -365,7 +365,7 @@ const cartCount = ref(0);
   display: flex;
   justify-content: flex-end;
   padding: 0.25rem 1rem;  /* 大约 4px 16px */
-  background: #16212a;    /* 比主导航再深一点 */
+  background: #191919;    /* 比主导航再深一点 */
   font-size: 14px;        /* 统一字体大小 */
   color: #cfd8dc;         /* 浅灰白 (#cfd8dc) */
 }
@@ -574,8 +574,8 @@ const cartCount = ref(0);
   position: absolute;
   top: 100%;
   margin-top: 4px;
-  background: #1c2b3c;         /* 与 .site-header 一致的背景色 */
-  border: 1px solid #273742;   /* 深色边框 */
+  background: #191919;         /* 与 .site-header 一致的背景色 */
+  border: 1px solid #191919;   /* 深色边框 */
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   min-width: 160px;            /* 160px 最合适，太窄会折行 */
