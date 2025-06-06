@@ -1,87 +1,87 @@
-  <script setup lang="ts">
+<script setup lang="ts">
 
-  const topCarousel = [
-    {
-      id: 1,
-      url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67f2aa9508ec08000e25efae/2160x.webp?source_format=jpg',
-    },
-    {
-      id: 2,
-      url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/6613a935a849d9000e7715e5/2160x.webp?source_format=jpg',
-    },
-    {
-      id: 3,
-      url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/657849392677e60011e85951/2160x.webp?source_format=png',
-    },
-    {
-      id: 4,
-      url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67f2aab2401dfd000d28bf3f/2160x.webp?source_format=jpg',
-    },
-  ]
-  const bottomCarousel = [
-    {
-      id: 1,
-      url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/65798683eb2b63001478270e/1296x.webp?source_format=png',
-    },
-    {
-      id: 2,
-      url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/65789b19390f27001dec1c61/1296x.webp?source_format=jpg',
-    },
-    {
-      id: 3,
-      url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/6579894bbd2a170011d9d00e/1296x.webp?source_format=png',
-    },
-    {
-      id: 4,
-      url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/657982603fc56f001d79c4ed/1080x.webp?source_format=png',
-    },
-    {
-      id: 5,
-      url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/65798b6926bb730011c7dc8d/1296x.webp?source_format=png',
-    },
-  ]
-  const warrantyImgUrl = "https://shoplineimg.com/62146b2be0f4410023ad65f9/67fe86f435881a3df004c23f/2160x.webp?source_format=jpg"
-  const lieImgUrl = 'https://shoplineimg.com/62146b2be0f4410023ad65f9/665354f66df50d001960dbe6/540x.webp?source_format=jpg'
-  const pressImgUrl = 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67f2ab4c4780c2000a2c49c2/2160x.webp?source_format=jpg'
-  const badImgUrl = 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67f2ab7a9661f7000ee81f51/2160x.webp?source_format=jpg'
-  const phoneImgUrl = 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67f2ab8c317b0f0011403189/2160x.webp?source_format=jpg'
-  const chairImgUrl = 'https://shoplineimg.com/62146b2be0f4410023ad65f9/6605153510beaf0017e424c6/2160x.webp?source_format=jpg'
-  const commentImgUrl = 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67fe87509a5ef8420c0861a2/2160x.webp?source_format=jpg'
-  const blogInfoArr = [
-    {
-      title: 'Blog Post 1',
-      description: 'Description for blog post 1',
-      imageUrl: 'https://img.shoplineapp.com/media/image_clips/6690a346b80e24000d5c217b/original.png?1720755013',
-      link: 'https://example.com/blog1',
-      data: '2023-10-01'
-    },
-    {
-      title: 'Blog Post 2',
-      description: 'Description for blog post 2',
-      imageUrl: 'https://img.shoplineapp.com/media/image_clips/64986cd4b89b510011208beb/original.jpg?1687710932',
-      link: 'https://example.com/blog2',
-      data: '2023-10-02'
-    },
-    {
-      title: 'Blog Post 3',
-      description: 'Description for blog post 3',
-      imageUrl: '	https://img.shoplineapp.com/media/image_clips/63e769a17d0520000ebcec3d/original.jpg?1676110241',
-      link: 'https://example.com/blog3',
-      data: '2023-10-03'
-    },
-    {
-      title: 'Blog Post 4',
-      description: 'Description for blog post 4',
-      imageUrl: 'https://img.shoplineapp.com/media/image_clips/640fda72cee31b0017cbcc8e/original.jpg?1678760562',
-      link: 'https://example.com/blog4',
-      data: '2023-10-04'
-    }
-  ]
+const topCarousel = [
+  {
+    id: 1,
+    url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67f2aa9508ec08000e25efae/2160x.webp?source_format=jpg',
+  },
+  {
+    id: 2,
+    url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/6613a935a849d9000e7715e5/2160x.webp?source_format=jpg',
+  },
+  {
+    id: 3,
+    url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/657849392677e60011e85951/2160x.webp?source_format=png',
+  },
+  {
+    id: 4,
+    url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67f2aab2401dfd000d28bf3f/2160x.webp?source_format=jpg',
+  },
+]
+const bottomCarousel = [
+  {
+    id: 1,
+    url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/65798683eb2b63001478270e/1296x.webp?source_format=png',
+  },
+  {
+    id: 2,
+    url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/65789b19390f27001dec1c61/1296x.webp?source_format=jpg',
+  },
+  {
+    id: 3,
+    url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/6579894bbd2a170011d9d00e/1296x.webp?source_format=png',
+  },
+  {
+    id: 4,
+    url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/657982603fc56f001d79c4ed/1080x.webp?source_format=png',
+  },
+  {
+    id: 5,
+    url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/65798b6926bb730011c7dc8d/1296x.webp?source_format=png',
+  },
+]
+const warrantyImgUrl = "https://shoplineimg.com/62146b2be0f4410023ad65f9/67fe86f435881a3df004c23f/2160x.webp?source_format=jpg"
+const lieImgUrl = 'https://shoplineimg.com/62146b2be0f4410023ad65f9/665354f66df50d001960dbe6/540x.webp?source_format=jpg'
+const pressImgUrl = 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67f2ab4c4780c2000a2c49c2/2160x.webp?source_format=jpg'
+const badImgUrl = 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67f2ab7a9661f7000ee81f51/2160x.webp?source_format=jpg'
+const phoneImgUrl = 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67f2ab8c317b0f0011403189/2160x.webp?source_format=jpg'
+const chairImgUrl = 'https://shoplineimg.com/62146b2be0f4410023ad65f9/6605153510beaf0017e424c6/2160x.webp?source_format=jpg'
+const commentImgUrl = 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67fe87509a5ef8420c0861a2/2160x.webp?source_format=jpg'
+const blogInfoArr = [
+  {
+    title: 'Blog Post 1',
+    description: 'Description for blog post 1',
+    imageUrl: 'https://img.shoplineapp.com/media/image_clips/6690a346b80e24000d5c217b/original.png?1720755013',
+    link: 'https://example.com/blog1',
+    data: '2023-10-01'
+  },
+  {
+    title: 'Blog Post 2',
+    description: 'Description for blog post 2',
+    imageUrl: 'https://img.shoplineapp.com/media/image_clips/64986cd4b89b510011208beb/original.jpg?1687710932',
+    link: 'https://example.com/blog2',
+    data: '2023-10-02'
+  },
+  {
+    title: 'Blog Post 3',
+    description: 'Description for blog post 3',
+    imageUrl: '	https://img.shoplineapp.com/media/image_clips/63e769a17d0520000ebcec3d/original.jpg?1676110241',
+    link: 'https://example.com/blog3',
+    data: '2023-10-03'
+  },
+  {
+    title: 'Blog Post 4',
+    description: 'Description for blog post 4',
+    imageUrl: 'https://img.shoplineapp.com/media/image_clips/640fda72cee31b0017cbcc8e/original.jpg?1678760562',
+    link: 'https://example.com/blog4',
+    data: '2023-10-04'
+  }
+]
 </script>
 <template>
   <div class="home-container">
     <Carousel :originalImages="topCarousel" />
-    <div><img :src="warrantyImgUrl" alt=""></div>
+    <div class="big-img"><img :src="warrantyImgUrl" alt=""></div>
     <div class="introduce">
       <div class="introduce-txt-img">
         <img style="width: 525px;" :src="lieImgUrl" alt="">
@@ -104,7 +104,7 @@
         </iframe>
       </div>
     </div>
-    <div>
+    <div class="big-img">
       <img :src="pressImgUrl" alt="">
       <img :src="badImgUrl" alt="">
       <img :src="phoneImgUrl" alt="">
@@ -122,7 +122,7 @@
         </iframe>
       </div>
     </div>
-    <div>
+    <div class="big-img">
       <img :src="chairImgUrl" alt="">
       <img :src="commentImgUrl" alt="">
     </div>
@@ -148,7 +148,7 @@
           </a>
         </li>
       </ul>
-      <button >查看更多</button>
+      <button>查看更多</button>
     </div>
 
   </div>
@@ -156,6 +156,7 @@
 <style scoped>
 .home-container {
   background: #1d1a1a;
+  overflow-x: hidden;
 }
 
 .introduce {
@@ -195,7 +196,7 @@
 
 .introduce-text-video {
   display: flex;
-  margin-top: 70px;
+  margin: 70px 0;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -209,22 +210,19 @@
 }
 
 .blog {
-  width: 1100px;
+  width: 68.5rem;
   height: 670px;
   max-height: 1000px;
   margin: 0 auto;
   padding: 20px;
   color: white;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .blog button {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  /* 将按钮的左边距设置为容器宽度的一半 */
-  transform: translateX(-50%);
-  /* 向左移动自身宽度的一半 */
+  margin-top: 200px;
   cursor: pointer;
   background: #ac886b;
   border: none;
@@ -248,5 +246,72 @@
   width: 247px;
   height: 100%;
   object-fit: cover;
+}
+
+@media screen and (max-width: 768px) {
+  .home-container {
+    padding: 10px;
+  }
+
+  .big-img {
+    width: 100%;
+  }
+
+  .introduce {
+    padding: 30px 0;
+    gap: 40px;
+  }
+
+  .introduce-txt-img {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .text-block {
+    width: 100%;
+    padding: 0 10px;
+    text-align: center;
+  }
+
+  .video {
+    width: 100%;
+    height: auto;
+  }
+
+  .carousel-container {
+    width: 100%;
+    padding-bottom: 20px;
+  }
+
+  .blog {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .blog-list {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .blog-list img {
+    width: 100%;
+    height: auto;
+  }
+
+  .blog button {
+    margin-top: 50px;
+    width: 80%;
+    padding: 10px;
+  }
+
+  .big-img {
+    width: 100%;
+  }
+
+  .big-img img {
+    width: 100%;
+    height: auto;
+  }
 }
 </style>
