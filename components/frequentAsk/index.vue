@@ -65,85 +65,43 @@ const afterLeave = (el) => {
 
 
 <template>
-    <div class="frequent-ask-container">
-        <div class="frequent-ask">
-            <h2>常見問題</h2>
-            <ul>
-                <li v-for="(item, index) in frequentAskList" :key="index" class="faq-item">
-                    <div class="faq-header" @click="toggleAnswer(index)">
-                        <h3 class="faq-question">
-                            {{ item.question }}
-                        </h3>
-                        <div>
-                            <img :src="'/svg/plus.svg'" alt="Toggle Icon" class="toggle-icon"
-                                :class="{ rotated: item.isOpen }" />
-
-                        </div>
-                    </div>
-                    <transition @before-enter="beforeEnter" @enter="enter" @after-enter="afterEnter"
-                        @before-leave="beforeLeave" @leave="leave" @after-leave="afterLeave">
-                        <p v-if="item.isOpen" class="faq-answer">
-                            {{ item.answer }}
-                        </p>
-                    </transition>
-                </li>
-            </ul>
-        </div>
+  <div class="w-full bg-white">
+    <div class="max-w-[1100px] mx-auto p-5">
+      <h2 class="text-2xl font-bold mb-4">常見問題</h2>
+      <ul>
+        <li
+          v-for="(item, index) in frequentAskList"
+          :key="index"
+          class="mb-2 border-b border-gray-300 py-2 cursor-pointer"
+        >
+          <div
+            class="flex justify-between items-center"
+            @click="toggleAnswer(index)"
+          >
+            <h3 class="text-lg font-bold text-gray-800 hover:text-[#ac886b]">
+              {{ item.question }}
+            </h3>
+            <img
+              src="/svg/plus.svg"
+              alt="Toggle Icon"
+              class="w-[30px] h-[30px] ml-2 transition-transform duration-300"
+              :class="{ 'rotate-[150deg]': item.isOpen }"
+            />
+          </div>
+          <transition
+            @before-enter="beforeEnter"
+            @enter="enter"
+            @after-enter="afterEnter"
+            @before-leave="beforeLeave"
+            @leave="leave"
+            @after-leave="afterLeave"
+          >
+            <p v-if="item.isOpen" class="mt-2 text-gray-600 px-4">
+              {{ item.answer }}
+            </p>
+          </transition>
+        </li>
+      </ul>
     </div>
+  </div>
 </template>
-
-<style scoped>
-.frequent-ask-container {
-    width: 100%;
-    background: white;
-}
-
-.frequent-ask {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.faq-item {
-    margin-bottom: 10px;
-    border-bottom: 1px solid #ddd;
-    padding: 10px 0;
-    cursor: pointer;
-}
-
-.faq-question {
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-    transition: color 0.3s;
-}
-
-.faq-question:hover {
-    color: #ac886b;
-}
-
-.faq-answer {
-    margin-top: 8px;
-    color: #555;
-    padding: 0 16px;
-    will-change: max-height, opacity;
-
-}
-
-.toggle-icon {
-    width: 30px;
-    height: 30px;
-    margin-left: 10px;
-    transition: transform 0.3s ease;
-}
-
-.rotated {
-    transform: rotate(150deg);
-}
-
-.faq-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-</style>

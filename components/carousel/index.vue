@@ -60,68 +60,31 @@ onMounted(() => {
 })
 </script>
 <template>
-    <div class="carousel">
-        <!-- 輪播圖片容器 -->
-        <div class="carousel-track" :style="{
-            transform: `translateX(-${currentIndex * 100}%)`,
-            transition: enableTransition ? 'transform 1s ease-in-out' : 'none'
-        }" @transitionend="handleTransitionEnd">
-            <img v-for="(image, index) in displayImages" :key="index" :src="image.url" alt="carousel image" />
-        </div>
-           <!-- 圓點指示器 -->
-        <div class="carousel-dot">
-            <div class="carousel-dots">
-                <span v-for="(_
-                    , index) in originalImages.length" :key="index" :class="{ active: index === realIndex }"
-                    @click="goToSlide(index)"></span>
-            </div>
-        </div>
-
+  <div class="relative w-full overflow-hidden">
+    <div class="flex" :style="{
+      transform: `translateX(-${currentIndex * 100}%)`,
+      transition: enableTransition ? 'transform 1s ease-in-out' : 'none'
+    }" @transitionend="handleTransitionEnd">
+      <img
+        v-for="(image, index) in displayImages"
+        :key="index"
+        :src="image.url"
+        alt="carousel image"
+        class="w-full shrink-0"
+      />
     </div>
+
+    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 z-10">
+      <div class="flex justify-center space-x-2 mt-2">
+        <span
+          v-for="(_, index) in originalImages.length"
+          :key="index"
+          class="w-2.5 h-2.5 rounded-full cursor-pointer"
+          :class="index === realIndex ? 'bg-gray-800' : 'bg-gray-300'"
+          @click="goToSlide(index)"
+        ></span>
+      </div>
+    </div>
+  </div>
 </template>
-<style scoped>
-.carousel {
-    position: relative;
-    width: 100%;
-    margin: auto;
-    overflow: hidden;
-}
 
-.carousel-track {
-    display: flex;
-}
-
-.carousel-track img {
-    width: 100%;
-    flex-shrink: 0;
-}
-
-.carousel-dot {
-    z-index: 1000;
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    /* 將左邊距設置為容器寬度的一半 */
-    transform: translateX(-50%);
-    /* 向左移動自身寬度的一半 */
-}
-
-.carousel-dots {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-}
-
-.carousel-dots span {
-    width: 10px;
-    height: 10px;
-    margin: 0 5px;
-    background-color: #ccc;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.carousel-dots span.active {
-    background-color: #333;
-}
-</style>

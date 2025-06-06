@@ -36,7 +36,7 @@
       <nav class="main-nav__links" v-if="isDesktop">
         <NuxtLink to="/" exact class="main-nav__link">首頁</NuxtLink>
         <NuxtLink to="/about" class="main-nav__link">關於masa</NuxtLink>
-        <NuxtLink to="/products/featured" class="main-nav__link"
+        <NuxtLink to="/products" class="main-nav__link"
           >精選商品</NuxtLink
         >
         <NuxtLink to="/testimonials" class="main-nav__link">客戶心得</NuxtLink>
@@ -135,7 +135,7 @@
             >關於masa</NuxtLink
           >
           <NuxtLink
-            to="/products/featured"
+            to="/products"
             class="mobile-menu__link"
             @click="closeAll"
             >精選商品</NuxtLink
@@ -353,7 +353,6 @@ const cartCount = ref(0);
   right: 0;
   background: #191919;     /* 深夜蓝色背景（可根据官网实际稍作微调） */
   z-index: 999;
-  border-bottom: 1px solid #273742; /* 深一点的分隔线 */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 

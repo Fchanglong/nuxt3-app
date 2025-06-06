@@ -79,239 +79,81 @@ const blogInfoArr = [
 ]
 </script>
 <template>
-  <div class="home-container">
+  <div class=" overflow-x-hidden px-4 md:px-0">
     <Carousel :originalImages="topCarousel" />
-    <div class="big-img"><img :src="warrantyImgUrl" alt=""></div>
-    <div class="introduce">
-      <div class="introduce-txt-img">
-        <img style="width: 525px;" :src="lieImgUrl" alt="">
-        <div class="text-block">
-          <span style="font-size: 1.8rem; font-weight: 700;">小空間的極致享受!</span>
-          <span style="color: gray;">我們相信，空間與預算不應該是體驗被妥協的理由</span>
-          <p style="width: 525px; text-align: center;">masa 耗時三年，開發出超越頂級按摩椅自由度、精準度的控制系統，並結合至輕薄的按摩椅墊中，
-            成為市面上唯一一款不佔空間、超高CP值且極度精準的背部按摩器，短短兩年內即成為同品類的銷量冠軍!</p>
-          <button class="design-btn">
-            點我看設計理念
-          </button>
+
+    <div class="w-full">
+      <img :src="warrantyImgUrl" alt="" class="w-full" />
+    </div>
+
+    <div class="flex flex-col items-center gap-[70px] py-[60px] md:gap-[70px] md:py-[60px]">
+      <div class="flex flex-col md:flex-row gap-5 mt-[50px] items-center md:items-start">
+        <img :src="lieImgUrl" alt="" class="w-[525px]" />
+
+        <div class="w-full md:w-[555px] flex flex-col items-center text-white gap-5 font-bold px-2.5 text-center">
+          <span class="text-[1.8rem]">小空間的極致享受!</span>
+          <span class="text-gray-400">我們相信，空間與預算不應該是體驗被妥協的理由</span>
+          <p class="w-[525px] text-center">
+            masa 耗時三年，開發出超越頂級按摩椅自由度、精準度的控制系統，並結合至輕薄的按摩椅墊中，
+            成為市面上唯一一款不佔空間、超高CP值且極度精準的背部按摩器，短短兩年內即成為同品類的銷量冠軍!
+          </p>
+          <button class="text-white bg-[#ac886b] px-10 py-1.5 rounded text-[1.1rem]">點我看設計理念</button>
         </div>
       </div>
-      <div>
-        <iframe class="video" width="1100" height="562"
-          src="https://www.youtube.com/embed/bBXP8bJ0uCk?iv_load_policy=3&playsinline=1&start=0&rel=0&autoplay=0&mute=0&muted=0"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen>
-        </iframe>
-      </div>
+
+      <iframe
+        class="w-full md:w-[1100px] h-auto  md:h-[562px]"
+        src="https://www.youtube.com/embed/bBXP8bJ0uCk?iv_load_policy=3&playsinline=1&start=0&rel=0&autoplay=0&mute=0&muted=0"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
     </div>
-    <div class="big-img">
-      <img :src="pressImgUrl" alt="">
-      <img :src="badImgUrl" alt="">
-      <img :src="phoneImgUrl" alt="">
+
+    <div class="w-full">
+      <img :src="pressImgUrl" alt="" class="w-full" />
+      <img :src="badImgUrl" alt="" class="w-full" />
+      <img :src="phoneImgUrl" alt="" class="w-full" />
     </div>
-    <div class="introduce-text-video">
-      <span style="font-size: 1.8rem; font-weight: 700; color: white; padding-bottom: 50px;">
-        產品特色說明
-      </span>
-      <div>
-        <iframe class="video" width="1100" height="562"
-          src="https://www.youtube.com/embed/Gdey5SsWo5k?iv_load_policy=3&playsinline=1&start=0&rel=0&autoplay=0&mute=0&muted=0"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen>
-        </iframe>
-      </div>
+
+    <div class="flex flex-col items-center justify-center  my-[70px]">
+      <span class="text-white  text-[1.8rem] pb-[50px]">產品特色說明</span>
+      <iframe
+        class="w-full md:w-[1100px] h-auto md:h-[562px]"
+        src="https://www.youtube.com/embed/Gdey5SsWo5k?iv_load_policy=3&playsinline=1&start=0&rel=0&autoplay=0&mute=0&muted=0"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
     </div>
-    <div class="big-img">
-      <img :src="chairImgUrl" alt="">
-      <img :src="commentImgUrl" alt="">
+
+    <div class="w-full">
+      <img :src="chairImgUrl" alt="" class="w-full" />
+      <img :src="commentImgUrl" alt="" class="w-full" />
     </div>
-    <div>
-    </div>
-    <div class="carousel-container">
-      <div style="width: 1080px;">
+
+    <div class="flex justify-center pb-5">
+      <div class="w-[1080px]">
         <Carousel :originalImages="bottomCarousel" />
       </div>
     </div>
+
     <FrequentAsk />
-    <div class="blog">
-      <h2>部落格文章</h2>
-      <ul class="blog-list">
-        <li v-for="(item, index) in blogInfoArr" :key="index">
-          <img :src="item.imageUrl" alt="">
+
+    <div class="max-w-[68.5rem] w-full mx-auto px-5 text-white flex flex-col items-center">
+      <h2 class="text-2xl font-bold mb-4">部落格文章</h2>
+      <ul class="flex flex-col md:flex-row gap-5">
+        <li v-for="(item, index) in blogInfoArr" :key="index" class="flex flex-col items-start">
+          <img :src="item.imageUrl" alt="" class="w-full md:w-[247px] h-auto object-cover" />
           <span>{{ item.data }}</span>
-          <h3>{{ item.title }}</h3>
+          <h3 class="text-lg font-semibold">{{ item.title }}</h3>
           <p>{{ item.description }}</p>
-          <a style="color: #ac886b; font-weight: 700; text-decoration: underline; text-underline-offset: 4px;"
-            :href="item.link">
-            閲讀内文
-          </a>
+          <a :href="item.link" class="text-[#ac886b] font-bold underline underline-offset-4">閲讀内文</a>
         </li>
       </ul>
-      <button>查看更多</button>
+      <button class="mt-12 md:mt-[200px] px-10 py-2 rounded bg-[#ac886b] text-white hover:bg-white hover:text-[#1d1a1a] transition">
+        查看更多
+      </button>
     </div>
-
   </div>
 </template>
-<style scoped>
-.home-container {
-  background: #1d1a1a;
-  overflow-x: hidden;
-}
-
-.introduce {
-  display: flex;
-  padding: 60px 0;
-  flex-direction: column;
-  align-items: center;
-  gap: 70px;
-}
-
-.introduce-txt-img {
-  display: flex;
-  gap: 20px;
-  margin-top: 50px;
-}
-
-.text-block {
-  width: 555px;
-  display: flex;
-  color: white;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  font-weight: 700;
-}
-
-.video {}
-
-.design-btn {
-  font-size: 1.1rem;
-  color: white;
-  background: #ac886b;
-  padding: 5px 40px;
-  border: none;
-  border-radius: 5px;
-}
-
-.introduce-text-video {
-  display: flex;
-  margin: 70px 0;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.carousel-container {
-  margin-top: 50px;
-  display: flex;
-  justify-content: center;
-  padding-bottom: 50px;
-}
-
-.blog {
-  width: 68.5rem;
-  height: 670px;
-  max-height: 1000px;
-  margin: 0 auto;
-  padding: 20px;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.blog button {
-  margin-top: 200px;
-  cursor: pointer;
-  background: #ac886b;
-  border: none;
-  color: white;
-  padding: 10px 60px;
-  border-radius: 5px;
-  color: white;
-  transition: all 0.3s ease;
-}
-
-.blog button:hover {
-  background: #ffffff;
-  color: #1d1a1a;
-}
-
-.blog-list {
-  display: flex;
-}
-
-.blog-list img {
-  width: 247px;
-  height: 100%;
-  object-fit: cover;
-}
-
-@media screen and (max-width: 768px) {
-  .home-container {
-    padding: 10px;
-  }
-
-  .big-img {
-    width: 100%;
-  }
-
-  .introduce {
-    padding: 30px 0;
-    gap: 40px;
-  }
-
-  .introduce-txt-img {
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .text-block {
-    width: 100%;
-    padding: 0 10px;
-    text-align: center;
-  }
-
-  .video {
-    width: 100%;
-    height: auto;
-  }
-
-  .carousel-container {
-    width: 100%;
-    padding-bottom: 20px;
-  }
-
-  .blog {
-    width: 100%;
-    padding: 10px;
-  }
-
-  .blog-list {
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .blog-list img {
-    width: 100%;
-    height: auto;
-  }
-
-  .blog button {
-    margin-top: 50px;
-    width: 80%;
-    padding: 10px;
-  }
-
-  .big-img {
-    width: 100%;
-  }
-
-  .big-img img {
-    width: 100%;
-    height: auto;
-  }
-}
-</style>
