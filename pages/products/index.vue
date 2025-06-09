@@ -69,8 +69,9 @@ const handleSort = (value) => {
             </div>
             <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <li v-for="product in products" :key="product.id"
-                    class="bg-[#1d1a1a] rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                    <div class="aspect-w-1 aspect-h-1">
+                    class="bg-[#1d1a1a] cursor-pointer rounded-lg overflow-hidden ">
+                  <NuxtLink :to="`/products/${product.id}`">
+                      <div class="aspect-w-1 aspect-h-1">
                         <img :src="product.imageUrl" :alt="product.name"
                             class="w-full h-full object-cover">
                     </div>
@@ -79,6 +80,7 @@ const handleSort = (value) => {
                         <p class="text-[#ac886b] font-bold mb-1">HK ${{ product.currentPrice }}</p>
                         <p class="text-gray-500 line-through">HK ${{ product.ogPrice }}</p>
                     </div>
+                  </NuxtLink>
                 </li>
             </ul>
         </div>

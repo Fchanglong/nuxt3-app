@@ -1,4 +1,6 @@
+
 <script setup lang="ts">
+import { ref } from "vue"
 
 const topCarousel = [
   {
@@ -77,6 +79,24 @@ const blogInfoArr = [
     data: '2023-10-04'
   }
 ]
+const frequentAskList = ref([
+  {
+    question: 'JOY 和 JOY PRO有何不同?',
+    answer: '相比第一代 JOY ，JOY PRO 強化了機芯設計，透過新導入的玻璃纖維強化齒輪成功提升50%動力，成為市面上唯一可平躺使用的按摩椅墊。',
+    isOpen: false
+  },
+  {
+    question: '30天體驗鑑賞方案是什麼？',
+    answer: '為了讓您放心體驗，masa提供30天體驗鑑賞方案...',
+    isOpen: false
+  },
+  {
+    question: '可以平躺使用嗎？',
+    answer: '可以平躺、斜躺按摩小腿、背部，不只沙發、床鋪、辦公椅都可以使用！',
+    isOpen: false
+  }
+])
+
 </script>
 <template>
   <div class=" overflow-x-hidden px-4 md:px-0">
@@ -138,9 +158,10 @@ const blogInfoArr = [
       </div>
     </div>
 
-    <FrequentAsk />
+   <Faq :faqList="frequentAskList" />
 
-    <div class="max-w-[68.5rem] w-full mx-auto px-5 text-white flex flex-col items-center">
+
+    <div class="max-w-[68.5rem] w-full mx-auto my-10 px-5 text-white flex flex-col items-center">
       <h2 class="text-2xl font-bold mb-4">部落格文章</h2>
       <ul class="flex flex-col md:flex-row gap-5">
         <li v-for="(item, index) in blogInfoArr" :key="index" class="flex flex-col items-start">
@@ -151,9 +172,9 @@ const blogInfoArr = [
           <a :href="item.link" class="text-[#ac886b] font-bold underline underline-offset-4">閲讀内文</a>
         </li>
       </ul>
-      <button class="mt-12 md:mt-[200px] px-10 py-2 rounded bg-[#ac886b] text-white hover:bg-white hover:text-[#1d1a1a] transition">
+      <NuxtLink to="/posts" class="mt-12 md:w-[200px] text-center md:mt-0 px-10 py-2 rounded bg-[#ac886b] text-white hover:bg-white hover:text-[#1d1a1a] transition">
         查看更多
-      </button>
+      </NuxtLink>
     </div>
   </div>
 </template>

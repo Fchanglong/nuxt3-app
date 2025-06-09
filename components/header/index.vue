@@ -69,7 +69,7 @@
           </ul>
         </div>
 
-        <NuxtLink to="/blog" class="main-nav__link">部落格首頁</NuxtLink>
+        <NuxtLink to="/posts" class="main-nav__link">部落格首頁</NuxtLink>
 
         <!-- “常見問答” 下拉 -->
         <div class="dropdown" ref="faqWrapper">
@@ -148,6 +148,7 @@
           >
 
           <!-- 移动端 “競品比較” 折叠菜单 -->
+        
           <button
             class="mobile-menu__link"
             @click="mobileCompareOpen = !mobileCompareOpen"
@@ -182,7 +183,7 @@
             </li>
           </ul>
 
-          <NuxtLink to="/blog" class="mobile-menu__link" @click="closeAll"
+          <NuxtLink to="/posts" class="mobile-menu__link" @click="closeAll"
             >部落格首頁</NuxtLink
           >
 
