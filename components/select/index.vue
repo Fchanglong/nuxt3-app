@@ -16,7 +16,7 @@ const selectedOption = ref(props.selects[0])
 const handleSelect = (option) => {
     selectedOption.value = option
     isOpen.value = false
-    emit('update:selected', option.value)
+    emit('update:selected', option)
 }
 
 // 點擊外部關閉下拉框
@@ -40,8 +40,9 @@ onUnmounted(() => {
 <template>
     <div class="z-50 relative" :ref="dropdownRef">
         <button @click.stop="isOpen = !isOpen"
-            class="w-48 px-4 py-2 text-left bg-[#1d1a1a] text-white border border-[#ac886b] rounded-md focus:outline-none focus:border-[#ac886b] transition-all duration-200">
+            class="w-full min-w-48 px-4 py-2 text-left   border rounded-md focus:outline-none  transition-all duration-200">
             {{ selectedOption.name }}
+            <!-- 圖標 -->
             <span class="absolute right-4 top-1/2 transform -translate-y-1/2">
                 <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': isOpen }" viewBox="0 0 20 20"
                     fill="currentColor">
@@ -56,10 +57,10 @@ onUnmounted(() => {
             leave-active-class="transition duration-75 ease-in" leave-from-class="transform scale-100 opacity-100"
             leave-to-class="transform scale-95 opacity-0">
             <ul v-if="isOpen"
-                class="absolute z-10 w-48 py-1 mt-1 bg-[#1d1a1a] border border-[#ac886b] rounded-md shadow-lg">
+                class="absolute z-10 w-full min-w-48 py-1 mt-1 bg-[#1d1a1a]   rounded-md shadow-lg">
                 <li v-for="option in selects" :key="option.id" @click="handleSelect(option)"
-                    class="px-4 py-2 text-white hover:bg-[#ac886b] cursor-pointer transition-colors duration-200"
-                    :class="{ 'bg-[#ac886b]': selectedOption.id === option.id }">
+                    class="px-4 py-2 text-white hover:bg-gray-500/15 cursor-pointer transition-colors duration-200"
+                    :class="{ 'bg-gray-500/15': selectedOption.id === option.id }">
                     {{ option.name }}
                 </li>
             </ul>

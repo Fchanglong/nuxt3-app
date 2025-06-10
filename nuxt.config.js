@@ -4,7 +4,10 @@ export default defineNuxtConfig({
   },
   compatibilityDate: '2025-05-15',
   css: ['~/assets/css/index.css'],
-  modules: ['@nuxtjs/tailwindcss'],
+  modules: [
+    '@nuxtjs/tailwindcss',
+    '@pinia/nuxt',
+  ],
   devtools: { enabled: true },
   ssr: true,
 })

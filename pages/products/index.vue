@@ -28,7 +28,7 @@ const products = ref([
         currentPrice: 19900,
         imageUrl: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/623d50d02e35be002dccff6b/375x.webp?source_format=jpg'
     },
-    
+
 ])
 
 const sortSeleteds = ref([
@@ -40,7 +40,7 @@ const sortSeleteds = ref([
 ])
 
 const handleSort = (value) => {
-    switch (value) {
+    switch (value.value) {
         case 'new':
             products.value.sort((a, b) => b.id - a.id)
             break
@@ -63,24 +63,23 @@ const handleSort = (value) => {
 <template>
     <div class="min-h-screen bg-[#1d1a1a]">
         <div class="max-w-7xl mx-auto px-4 py-8">
-            <div class="flex justify-between mb-10">
-                <span class="text-white font-bold text-2xl">精選商品</span>
+            <div class="flex justify-between mb-10 text-white ">
+                <span class="font-bold text-2xl">精選商品</span>
                 <Select :selects="sortSeleteds" @update:selected="handleSort" />
             </div>
             <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <li v-for="product in products" :key="product.id"
                     class="bg-[#1d1a1a] cursor-pointer rounded-lg overflow-hidden ">
-                  <NuxtLink :to="`/products/${product.id}`">
-                      <div class="aspect-w-1 aspect-h-1">
-                        <img :src="product.imageUrl" :alt="product.name"
-                            class="w-full h-full object-cover">
-                    </div>
-                    <div class="p-4 text-center">
-                        <h3 class="text-lg text-white font-bold mb-2">{{ product.name }}</h3>
-                        <p class="text-[#ac886b] font-bold mb-1">HK ${{ product.currentPrice }}</p>
-                        <p class="text-gray-500 line-through">HK ${{ product.ogPrice }}</p>
-                    </div>
-                  </NuxtLink>
+                    <NuxtLink :to="`/products/${product.id}`">
+                        <div class="aspect-w-1 aspect-h-1">
+                            <img :src="product.imageUrl" :alt="product.name" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-4 text-center">
+                            <h3 class="text-lg text-white font-bold mb-2">{{ product.name }}</h3>
+                            <p class="text-[#ac886b] font-bold mb-1">HK ${{ product.currentPrice }}</p>
+                            <p class="text-gray-500 line-through">HK ${{ product.ogPrice }}</p>
+                        </div>
+                    </NuxtLink>
                 </li>
             </ul>
         </div>

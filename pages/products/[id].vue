@@ -8,10 +8,14 @@ const productInfo = ref({
     desText: `※本商品僅適用Joy Pro機型，Joy機型不適用。
 ※布套部分僅有上半頭枕區域及網布區域，並非整個全布套，如需全布套替換服務，請與客服Line@聯繫。
 ※本商品不適用30天體驗鑑賞活動，拆封後無法退換。`,
+    id: 1,
+    name: '替換布套 (Joy Pro 智慧按摩椅墊 適用)',
+    desText: `※本商品僅適用Joy Pro機型，Joy機型不適用。
+※布套部分僅有上半頭枕區域及網布區域，並非整個全布套，如需全布套替換服務，請與客服Line@聯繫。
+※本商品不適用30天體驗鑑賞活動，拆封後無法退換。`,
     desImg: [
         'https://img.shoplineapp.com/media/image_clips/67ebab40e24d79000abb01f2/original.png?1743498047',
-        'https://img.shoplineapp.com/media/image_clips/67eccd002c4d470011d834a3/original.gif?1743572222',
-
+        'https://img.shoplineapp.com/media/image_clips/67eccd002c4d470011d834a3/original.gif?1743572222'
     ],
     ogPrice: 283.11,
     currentPrice: 230.69,
@@ -25,54 +29,82 @@ const productInfo = ref({
 信用卡一次付款
 銀行轉帳`
     },
-    showImg: [
-        'https://shoplineimg.com/62146b2be0f4410023ad65f9/67eccbbf5d18a9000eb41cba/800x.webp?source_format=png',
-        'https://shoplineimg.com/62146b2be0f4410023ad65f9/67ebaf31425acc000b9ea2e6/800x.webp?source_format=jpg'
-    ],
-    productColorImg: [
-        {
-            color: '銀河灰',
-            url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67eccbbf5d18a9000eb41cba/800x.webp?source_format=png'
-        },
-        {
-            color: '海軍藍',
-            url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67eccbc6271e8e000d310c39/800x.webp?source_format=png'
-        },
-        {
-            color: '褐木棕',
-            url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67eccbcd0046c6000ba998a6/800x.webp?source_format=png'
-        },
-        {
-            color: '鋼鐵灰',
-            url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67ed2efb9d46c3000a5d8b67/800x.webp?source_format=png'
-        }
-    ],
+    images: {
+        colors: [
+            {
+                color: '銀河灰',
+                url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67eccbbf5d18a9000eb41cba/800x.webp?source_format=png'
+            },
+            {
+                color: '海軍藍',
+                url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67eccbc6271e8e000d310c39/800x.webp?source_format=png'
+            },
+            {
+                color: '褐木棕',
+                url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67eccbcd0046c6000ba998a6/800x.webp?source_format=png'
+            },
+            {
+                color: '鋼鐵灰',
+                url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67ed2efb9d46c3000a5d8b67/800x.webp?source_format=png'
+            }
+        ],
+        thumbnails: [
+            'https://shoplineimg.com/62146b2be0f4410023ad65f9/67eccbbf5d18a9000eb41cba/800x.webp?source_format=png',
+            'https://shoplineimg.com/62146b2be0f4410023ad65f9/67ebaf31425acc000b9ea2e6/800x.webp?source_format=jpg'
+        ]
+    },
+    selectedColor: '銀河灰',
+    selectedImage: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67eccbbf5d18a9000eb41cba/800x.webp?source_format=png',
     aboutProducts: [
         {
-            id: 2,
-            name: 'JOY PRO 智慧按摩椅墊',
+            id: 3,
+            name: 'Joy 智慧按摩椅墊',
             ogPrice: 29900,
             currentPrice: 19900,
-            imageUrl: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/65ba17658a9cfc0023808085/375x.webp?source_format=jpg'
+            imageUrl: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/6323096f9514ce4eec4c1308/375x.webp?source_format=jpg'
         },
         {
-            id: 3,
+            id: 4,
             name: 'Joy / Joy Pro 全布套更換(含服務)',
             ogPrice: 29900,
             currentPrice: 19900,
-            imageUrl: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/623d50d02e35be002dccff6b/540x.webp?source_format=jpg'
-        },
+            imageUrl: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/623d50d02e35be002dccff6b/375x.webp?source_format=jpg'
+        }
     ]
 })
+let selectedColor = ref(
+    {
+        color: '銀河灰',
+        url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67eccbbf5d18a9000eb41cba/800x.webp?source_format=png'
+    }
+)
+const handleColorChange = (color) => {
+    selectedColor.value = productInfo.value.images.colors.find(item => item.color === color)
+    if (selectedColor.value) {
+        productInfo.value.selectedColor = selectedColor.value.color
+        productInfo.value.selectedImage = selectedColor.value.url
+    }
+}
+
+const handleImageChange = (image) => {
+    productInfo.value.selectedImage = image
+}
 
 const activeTab = ref('商品描述')
-
 const tabs = [
     { name: '商品描述', key: 'desImg' },
     { name: '了解更多', key: 'knowMore' },
     { name: '送貨及付款方式', key: 'deliverAndPay' },
     { name: '顧客評價', key: 'comments' }
 ]
+const handleCountChange = (action) => {
+    if (action === 'add') {
+        count.value += 1
+
+    } else if (action === 'reduce' && count.value > 1) {
+        count.value -= 1
+    }
+}
 </script>
 <template>
     <div class="p-10 w-full flex flex-col items-center">
@@ -80,11 +112,11 @@ const tabs = [
             <!-- 圖片部分 -->
             <div class="flex gap-4">
                 <div class="w-[120px] flex flex-col gap-2">
-                    <img class="w-full object-cover cursor-pointer" v-for="item in productInfo.showImg" :src="item"
-                        alt="">
+                    <img class="w-full object-cover cursor-pointer" v-for="image in productInfo.images.thumbnails"
+                        :key="image" :src="image" @click="handleImageChange(image)" alt="">
                 </div>
                 <div class="w-full md:w-[425px] md:h-[425px]">
-                    <img class="w-full object-cover" :src="productInfo.showImg[0]" alt="">
+                    <img class="w-full object-cover" :src="productInfo.selectedImage" alt="">
                 </div>
             </div>
             <!-- 右邊部分 -->
@@ -108,18 +140,20 @@ const tabs = [
 
                 <div>
                     <span class="text-gray-500 text-sm font-semibold">
-                        顔色:{{ productInfo.productColorImg[0].color }}
+                        顔色: {{ productInfo.selectedColor }}
                     </span>
-                    <div class="flex w-10 gap-3 ">
-                        <img class="border-[3px] border-gray-400 rounded-md cursor-pointer"
-                            v-for="item in productInfo.productColorImg" :src="item.url" alt="">
+                    <div class="flex gap-3 w-10">
+                        <img class="border-[2px]  rounded-md cursor-pointer "
+                            :class="{ 'border-[#ac886b]': selectedColor.color === color.color }"
+                            v-for="color in productInfo.images.colors" :key="color.color" :src="color.url"
+                            @click="handleColorChange(color.color)" alt="">
                     </div>
                 </div>
 
                 <div class="text-3xl flex justify-center items-center gap-8 ">
-                    <button class="cursor-pointer">+</button>
+                    <button @click="handleCountChange('reduce')" class="cursor-pointer">-</button>
                     <span class="text-xl">{{ count }}</span>
-                    <button class="cursor-pointer">-</button>
+                    <button @click="handleCountChange('add')" class="cursor-pointer">+</button>
                 </div>
                 <div class="text-white font-medium text-xl flex gap-5">
                     <button class="px-10 py-2.5 bg-[#ac886b]">加入購物車</button>
