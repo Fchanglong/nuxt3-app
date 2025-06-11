@@ -1,5 +1,5 @@
 <script setup>
-import { useStepStore } from '~/stores/stepStore'
+import { useStepStore } from '~/stores/index'
 const store = useStepStore()
 const props = defineProps({
     steps: {

@@ -108,9 +108,12 @@
 
         <!-- 桌面端购物车放在最右侧 -->
         <div class="main-nav__cart">
-          <NuxtLink to="/cart" class="cart-link">
+          <!-- <NuxtLink to="/cart" class="cart-link">
             🛒<span class="cart-count">{{ cartCount }}</span>
-          </NuxtLink>
+          </NuxtLink> -->
+            <button  class="cart-link " @click="cartStore.toggleCartModal">
+            🛒<span class="cart-count">{{ cartStore.cartCount }}</span>
+          </button>
         </div>
       </nav>
     </div>
@@ -261,7 +264,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-
+import { useCartStore } from "~/stores/index"; // 假设你有一个购物车 store
+const cartStore = useCartStore();
 // ==============================
 // 1. 响应式判断：宽度 ≥768px 为桌面端
 // ==============================

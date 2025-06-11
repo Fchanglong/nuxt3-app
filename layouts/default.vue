@@ -7,6 +7,9 @@
         <NuxtPage />
       </main>
       <Footer/>
+      
+      <!-- 購物車模態框 -->
+      <CartModal />
     </div>
   </template>
   <script setup>

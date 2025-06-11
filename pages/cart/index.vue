@@ -1,6 +1,7 @@
 <script setup>
-import { useStepStore } from '~/stores/stepStore'
+import { useStepStore } from '~/stores/index.js'
 const store = useStepStore()
+
 const router = useRouter()
 const steps = [
     { label: '購物車', number: 1 },
@@ -21,6 +22,7 @@ const cartItems = ref([
 
 const removeItem = (id) => {
     cartItems.value = cartItems.value.filter(item => item.id !== id)
+
 }
 // 增加數量
 const changeQuantity = (item, type) => {
@@ -53,7 +55,7 @@ onMounted(() => {
 <template>
     <div class="bg-white py-10 md:px-20 px-5">
         <!-- 進度條 -->
-        <progressBar :steps />
+        <ProgressBar :steps />
         <!-- 購物車表格 -->
         <div class="w-full mx-auto  border rounded  mt-14">
             <div class="h-16 flex items-center px-4 text-xl bg-gray-100">購物車 ({{ cartItems.length }} 件)</div>

@@ -1,7 +1,12 @@
 <script setup>
+import { useCartStore } from '~/stores/index'
+
 const route = useRoute()
 const id = route.params.id
 const count = ref(1)
+
+// 使用購物車 store
+const cartStore = useCartStore()
 const productInfo = ref({
     id: 1,
     name: '替換布套 (Joy Pro 智慧按摩椅墊 適用)',
@@ -108,16 +113,35 @@ const handleCountChange = (action) => {
 </script>
 <template>
     <div class="p-10 w-full flex flex-col items-center">
-        <div class=" w-full md:w-[1100px] md:flex ">
-            <!-- 圖片部分 -->
+        <div class=" w-full md:w-[1100px] md:flex ">        
             <div class="flex gap-4">
+                <!-- 缩略图列表 -->
                 <div class="w-[120px] flex flex-col gap-2">
-                    <img class="w-full object-cover cursor-pointer" v-for="image in productInfo.images.thumbnails"
-                        :key="image" :src="image" @click="handleImageChange(image)" alt="">
+                    <img 
+                        class="w-full object-cover cursor-pointer rounded-md border-2 transition-all duration-200 hover:scale-105"
+                        :class="{ 
+                            'border-[#ac886b] shadow-md': image === productInfo.selectedImage, 
+                            'border-gray-300 hover:border-[#ac886b]': image !== productInfo.selectedImage 
+                        }"
+                        v-for="image in productInfo.images.thumbnails" 
+                        :key="image" 
+                        :src="image"
+                        @click="handleImageChange(image)" 
+                        alt="产品缩略图"
+                    >
                 </div>
-                <div class="w-full md:w-[425px] md:h-[425px]">
-                    <img class="w-full object-cover" :src="productInfo.selectedImage" alt="">
-                </div>
+                <!-- 放大镜组件 -->
+                <ImageZoom
+                    :image-src="productInfo.selectedImage"
+                    :image-alt="productInfo.name"
+                    container-width="100%"
+                    container-height="425px"
+                    zoom-scale="150"
+                    :transition-duration="200"
+                    :show-indicator="true"
+                    :indicator-size="100"
+                    class="w-full md:w-[425px] md:h-[425px]"
+                />
             </div>
             <!-- 右邊部分 -->
             <div class="text-white flex flex-col md:w-[400px] ml-5 gap-4">
@@ -156,8 +180,8 @@ const handleCountChange = (action) => {
                     <button @click="handleCountChange('add')" class="cursor-pointer">+</button>
                 </div>
                 <div class="text-white font-medium text-xl flex gap-5">
-                    <button class="px-10 py-2.5 bg-[#ac886b]">加入購物車</button>
-                    <button class="px-10 py-2.5 bg-[#FD7812]">立即購買</button>
+                    <button @click="cartStore.addToCart(productInfo)" class="px-10 py-2.5 bg-[#ac886b]">加入購物車</button>
+                    <NuxtLink to="/cart" class="px-10 py-2.5 bg-[#FD7812]">立即購買</NuxtLink>
                 </div>
             </div>
         </div>
