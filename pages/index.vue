@@ -1,25 +1,23 @@
-
 <script setup lang="ts">
-import { ref } from "vue"
+import { useAsyncData } from "nuxt/app";
+import { getCateCommoditiesApi } from "~/api/commodify-api";
+// const topCarousel = ref([
+//   {
+//     id: 1,
+//     url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67f2aa9508ec08000e25efae/2160x.webp?source_format=jpg',
+//   }
+// ])
 
-const topCarousel = [
-  {
-    id: 1,
-    url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67f2aa9508ec08000e25efae/2160x.webp?source_format=jpg',
-  },
-  {
-    id: 2,
-    url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/6613a935a849d9000e7715e5/2160x.webp?source_format=jpg',
-  },
-  {
-    id: 3,
-    url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/657849392677e60011e85951/2160x.webp?source_format=png',
-  },
-  {
-    id: 4,
-    url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67f2aab2401dfd000d28bf3f/2160x.webp?source_format=jpg',
-  },
-]
+const getCarouselImages = async () => {
+  const res = await getCateCommoditiesApi();
+  return res.data.NEW.map(item => ({
+    id: item.cid,
+    url: item.images
+  }));
+};
+
+// 在 useAsyncData 中使用这个函数
+const { data: topCarousel } = await useAsyncData('carouselImages', getCarouselImages);
 const bottomCarousel = [
   {
     id: 1,
@@ -121,11 +119,9 @@ const frequentAskList = ref([
         </div>
       </div>
 
-      <iframe
-        class="w-full md:w-[1100px] h-auto  md:h-[562px]"
+      <iframe class="w-full md:w-[1100px] h-auto  md:h-[562px]"
         src="https://www.youtube.com/embed/bBXP8bJ0uCk?iv_load_policy=3&playsinline=1&start=0&rel=0&autoplay=0&mute=0&muted=0"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen>
       </iframe>
     </div>
@@ -138,11 +134,9 @@ const frequentAskList = ref([
 
     <div class="flex flex-col items-center justify-center  my-[70px]">
       <span class="text-white  text-[1.8rem] pb-[50px]">產品特色說明</span>
-      <iframe
-        class="w-full md:w-[1100px] h-auto md:h-[562px]"
+      <iframe class="w-full md:w-[1100px] h-auto md:h-[562px]"
         src="https://www.youtube.com/embed/Gdey5SsWo5k?iv_load_policy=3&playsinline=1&start=0&rel=0&autoplay=0&mute=0&muted=0"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen>
       </iframe>
     </div>
@@ -158,7 +152,7 @@ const frequentAskList = ref([
       </div>
     </div>
 
-   <Faq :faqList="frequentAskList" />
+    <Faq :faqList="frequentAskList" />
 
 
     <div class="max-w-[68.5rem] w-full mx-auto my-10 px-5 text-white flex flex-col items-center">
@@ -172,7 +166,8 @@ const frequentAskList = ref([
           <a :href="item.link" class="text-[#ac886b] font-bold underline underline-offset-4">閲讀内文</a>
         </li>
       </ul>
-      <NuxtLink to="/posts" class="mt-12 md:w-[200px] text-center md:mt-0 px-10 py-2 rounded bg-[#ac886b] text-white hover:bg-white hover:text-[#1d1a1a] transition">
+      <NuxtLink to="/posts"
+        class="mt-12 md:w-[200px] text-center md:mt-0 px-10 py-2 rounded bg-[#ac886b] text-white hover:bg-white hover:text-[#1d1a1a] transition">
         查看更多
       </NuxtLink>
     </div>

@@ -1,15 +1,17 @@
 <script setup>
-import { useCartStore } from '~/stores/index'
-const cartStore = useCartStore()
+import { useStore } from 'vuex'
+const store = useStore()
 const cartModal = ref(null)
 const isToggleClick = ref(false)  // 新增：記錄是否是切換按鈕的點擊
+// 使用 computed 從 Vuex 獲取購物車狀態
+const isCartModalOpen = computed(() => store.getters['cart/isModalOpen'])
+const cartItems = computed(() => store.getters['cart/getItems'])
 
 // 監聽商店的切換事件
-watch(() => cartStore.isCartModalOpen, (isOpen) => {
+watch(() => isCartModalOpen.value, (isOpen) => {
     if (isOpen) {
         // 模態框剛被打開，標記為切換操作
         isToggleClick.value = true
-
         setTimeout(() => {
             isToggleClick.value = false
         }, 0)
@@ -31,8 +33,18 @@ const handleClickOutside = (event) => {
     }
 
     if (cartModal.value && !cartModal.value.contains(event.target)) {
-        cartStore.isCartModalOpen = false
+        store.dispatch('cart/hideCartModal')
     }
+}
+
+// 移除商品
+const removeFromCart = (itemId) => {
+    store.dispatch('cart/removeFromCart', itemId)
+}
+
+// 關閉模態框
+const closeModal = () => {
+    store.dispatch('cart/hideCartModal')
 }
 
 onMounted(() => {
@@ -43,18 +55,20 @@ onBeforeUnmount(() => {
     document.removeEventListener('click', handleClickOutside)
 })
 </script>
+
 <template>
     <div>
         <!-- 遮罩 -->
-        <div v-if="cartStore.isCartModalOpen" class="fixed inset-0  bg-opacity-50 z-[1000]"
-            @click="cartStore.isCartModalOpen = false">
+        <div v-if="isCartModalOpen" class="fixed inset-0  bg-opacity-50 z-[1000]"
+            @click="closeModal">
         </div>
         <!-- 購物車模態框 -->
         <Transition name="slide">
-            <div ref="cartModal" class="w-[360px]  bg-[#191919] fixed right-0 top-5 p-3 z-[1001]"
-                v-if="cartStore.isCartModalOpen">
-                <ul v-if="cartStore.items.length" class="space-y-3 min-h-[150px]">
-                    <li v-for="item in cartStore.items" :key="item.id">
+            <div ref="cartModal"
+                class="w-[360px] h-full md:h-fit bg-[#191919] fixed right-0 top-0 md:top-5 px-3 py-6 z-[1001] overflow-y-auto"
+                v-if="isCartModalOpen">
+                <ul v-if="cartItems.length" class=" space-y-3  md:min-h-[150px]">
+                    <li v-for="item in cartItems" :key="item.id">
                         <div class="flex gap-3 items-start justify-between">
                             <img class="w-[88px] h-[88px] object-cover" :src="item.image" alt="">
                             <div class="flex flex-col flex-1">
@@ -66,17 +80,19 @@ onBeforeUnmount(() => {
                                     {{ item.quantity }} &times; HK$ {{ item.cuurentPrice }}
                                 </span>
                             </div>
-                            <div class="text-white cursor-pointer" @click.stop="cartStore.removeFromCart(item.id)">
+                            <div class="text-white cursor-pointer" @click.stop="removeFromCart(item.id)">
                                 &times;
                             </div>
                         </div>
                     </li>
-                    <NuxtLink to="/cart"
-                        class="block text-center w-full py-2 mt-4 text-white bg-[#ac886b] rounded hover:bg-white/80 transition-colors hover:text-black">
-                        前往結帳
-                    </NuxtLink>
+                    <div class="h-16 py-2 w-full flex justify-center">
+                        <NuxtLink to="/cart" class="flex-1 py-2 flex items-center justify-center
+                       text-white bg-[#ac886b] rounded hover:bg-white/80 transition-colors hover:text-black">
+                            前往結帳
+                        </NuxtLink>
+                    </div>
                 </ul>
-                <div v-else class="text-white h-[150px] flex items-center justify-center py-4">
+                <div v-else class="text-white h-full md:h-[150px] flex items-center justify-center py-4">
                     購物車是空的
                 </div>
             </div>

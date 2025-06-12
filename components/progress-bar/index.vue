@@ -1,13 +1,13 @@
 <script setup>
-import { useStepStore } from '~/stores/index'
-const store = useStepStore()
+import { useStore } from 'vuex'
+const store = useStore()
 const props = defineProps({
     steps: {
         type: Array,
         required: true
     }
 })
-const currentStep = computed(() => store.currentStep)
+const currentStep = computed(() => store.getters['step/getCurrentStep'])
 </script>
 
 <template>

@@ -38,7 +38,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="z-50 relative" :ref="dropdownRef">
+    <div class="z-50 relative" ref="dropdownRef">
         <button @click.stop="isOpen = !isOpen"
             class="w-full min-w-48 px-4 py-2 text-left   border rounded-md focus:outline-none  transition-all duration-200">
             {{ selectedOption.name }}

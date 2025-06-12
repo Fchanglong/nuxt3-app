@@ -1,6 +1,8 @@
 <script setup>
-import { useStepStore } from '~/stores/index.js'
-const store = useStepStore()
+// import { useStepStore } from '~/stores/index.js'
+// const store = useStepStore()
+import { useStore } from 'vuex'
+const store = useStore()
 const route = useRoute()
 const steps = [
     { label: '購物車', number: 1 },
@@ -20,7 +22,7 @@ const cartItems = ref([
 ])
 
 onMounted(() => {
-    store.setCurrentStep(2)
+    store.dispatch('step/setCurrentStep', 2)
 })
 </script>
 <template>

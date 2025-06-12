@@ -19,9 +19,12 @@
 
       <!-- 移动端：右侧并排 “购物车 + 汉堡按钮” – <768px 时可见 -->
       <div class="mobile-icons" v-if="!isDesktop">
-        <NuxtLink to="/cart" class="cart-link">
+        <!-- <NuxtLink to="/cart" class="cart-link">
           🛒<span class="cart-count">{{ cartCount }}</span>
-        </NuxtLink>
+        </NuxtLink> -->
+          <button  class="cart-link " @click="toggleCartModal">
+            🛒<span class="cart-count">{{ cartCount }}</span>
+          </button>
         <button
           class="main-nav__toggle"
           @click="mobileMenuOpen = !mobileMenuOpen"
@@ -36,7 +39,7 @@
       <nav class="main-nav__links" v-if="isDesktop">
         <NuxtLink to="/" exact class="main-nav__link">首頁</NuxtLink>
         <NuxtLink to="/about" class="main-nav__link">關於masa</NuxtLink>
-        <NuxtLink to="/products" class="main-nav__link"
+        <NuxtLink to="/products/categories" class="main-nav__link"
           >精選商品</NuxtLink
         >
         <NuxtLink to="/testimonials" class="main-nav__link">客戶心得</NuxtLink>
@@ -111,8 +114,8 @@
           <!-- <NuxtLink to="/cart" class="cart-link">
             🛒<span class="cart-count">{{ cartCount }}</span>
           </NuxtLink> -->
-            <button  class="cart-link " @click="cartStore.toggleCartModal">
-            🛒<span class="cart-count">{{ cartStore.cartCount }}</span>
+            <button  class="cart-link " @click="toggleCartModal">
+            🛒<span class="cart-count">{{ cartCount }}</span>
           </button>
         </div>
       </nav>
@@ -138,7 +141,7 @@
             >關於masa</NuxtLink
           >
           <NuxtLink
-            to="/products"
+            to="/products/categories"
             class="mobile-menu__link"
             @click="closeAll"
             >精選商品</NuxtLink
@@ -256,6 +259,7 @@
           <NuxtLink to="/cart" class="mobile-menu__link" @click="closeAll"
             >購物車 ({{ cartCount }})</NuxtLink
           >
+       
         </nav>
       </div>
     </transition>
@@ -263,9 +267,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useCartStore } from "~/stores/index"; // 假设你有一个购物车 store
-const cartStore = useCartStore();
+
+import { useStore } from 'vuex'
+const store = useStore()
+
+const toggleCartModal = () => store.dispatch('cart/toggleCartModal')
 // ==============================
 // 1. 响应式判断：宽度 ≥768px 为桌面端
 // ==============================
@@ -344,7 +350,7 @@ const closeAll = () => {
 // ==============================
 // 5. 购物车数量示例 (可替换为 Pinia/Store 中的实际值)
 // ==============================
-const cartCount = ref(0);
+const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
 </script>
 
 <style scoped>

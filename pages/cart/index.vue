@@ -1,7 +1,8 @@
 <script setup>
-import { useStepStore } from '~/stores/index.js'
-const store = useStepStore()
-
+// import { useStepStore } from '~/stores/index.js'
+// const store = useStepStore()
+import { useStore } from 'vuex'
+const store = useStore()
 const router = useRouter()
 const steps = [
     { label: '購物車', number: 1 },
@@ -48,7 +49,7 @@ const toCheckouyHandle = () => {
     router.push('/checkout')
 }
 onMounted(() => {
-    store.setCurrentStep(1)
+    store.dispatch('step/setCurrentStep', 1)
 })
 </script>
 

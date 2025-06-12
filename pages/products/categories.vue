@@ -1,31 +1,35 @@
 <script setup>
-import { useAsyncData } from 'nuxt/app'
-import { onMounted } from 'vue'
-import { getAllCommoditiesApi } from '~/api/commodify-api'
-// const products = ref([
-    //    {
-    //     id: 1,
-    //     name: '替換布套  (Joy Pro 智慧按摩椅墊 適用)',
-    //     ogPrice: 29900,
-    //     currentPrice: 19900,
-    //     imageUrl: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67ebaf31425acc000b9ea2e6/375x.webp?source_format=jpg'
-    // },
-    // {
-    //     oig_id: 1,
-    //     group_name: '替換布套  (Joy Pro 智慧按摩椅墊 適用)',
-    //     price_original_max: 29900,
-    //     price_min: 19900,
-    //     images: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67ebaf31425acc000b9ea2e6/375x.webp?source_format=jpg'
-    // }
-// ])
+import { getCateCommoditiesApi, getCommodityByIdApi } from '~/api/commodify-api'
+const currentCategoryId = ref(null) // 添加当前选中的分类ID
+//獲取菜單
+const { data: menu } =await useAsyncData('cateCommodities', async () => {
+    const res = await getCateCommoditiesApi()
+    return res.data.CATE || []
+})
+//在获取到 menu 后再设置默认值
+if (menu.value && menu.value.length > 0) {
+    currentCategoryId.value = menu.value[0].cid
+}
 
-// 使用 useAsyncData 
-const { data: products,  } = await useAsyncData('commodities', 
-  async () => {
-    const res = await getAllCommoditiesApi()
-    return res.data || []
-  }
+// 使用 useAsyncData 获取商品，响应 currentCategoryId 变化
+const { data: products, pending: productsLoading } = await useAsyncData(
+    () => `category-products-${currentCategoryId.value}`, // 动态 key
+    async () => {
+        if (!currentCategoryId.value) return []
+        const res = await getCommodityByIdApi(currentCategoryId.value)
+        return res.data || []
+    },
+    {
+        watch: [currentCategoryId], // 监听 currentCategoryId 变化
+        default: () => []
+    }
 )
+
+// 简化的切换分类函数
+const getCateCommodities = (cateId) => {
+    currentCategoryId.value = cateId
+    // useAsyncData 会自动重新获取数据
+}
 const sortSeleteds = ref([
     { id: 1, name: '商品排序', value: '' },
     { id: 2, name: '上架時間: 由新到舊', value: 'new' },
@@ -53,15 +57,26 @@ const handleSort = (value) => {
             products.value.sort((a, b) => a.id - b.id)
     }
 }
-
 </script>
 
 <template>
     <div class="min-h-screen bg-[#1d1a1a]">
         <div class="max-w-7xl mx-auto px-4 py-8">
             <div class="flex justify-between mb-10 text-white ">
-                <span class="font-bold text-2xl">精選商品</span>
+                <div class="w-80 flex items-center gap-4">
+                    <NuxtLink to="/products" class="font-bold text-2xl text-gray-500 ">全部商品</NuxtLink>
+                    <span>></span>
+                    <span v-for="item in menu" class="font-bold text-2xl cursor-pointer"
+                        :class="item.cid === currentCategoryId ? 'text-[#ac886b]' : 'text-gray-500'"
+                        :key="item.cid" @mouseover="getCateCommodities(item.cid)" @click="getCateCommodities(item.cid)">
+                        {{ item.cate_name }}
+                    </span>
+                </div>
                 <Select :selects="sortSeleteds" @update:selected="handleSort" />
+            </div>
+               <!-- 添加商品加载状态 -->
+            <div v-if="productsLoading" class="text-white text-center py-8">
+                正在加载商品...
             </div>
             <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <li v-for="product in products" :key="product.oig_id"

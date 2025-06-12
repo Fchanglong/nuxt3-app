@@ -6,6 +6,3 @@
 <script setup>
 import '@/assets/css/index.css';
 </script>
-<style>
-
-</style>

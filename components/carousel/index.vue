@@ -1,3 +1,4 @@
+<!-- filepath: c:\Users\df-lytc\nuxt3-app\components\carousel\index.vue -->
 <script setup>
 const props = defineProps({
   originalImages: {
@@ -7,74 +8,110 @@ const props = defineProps({
   }
 })
 
-// 建立含 clone 的新陣列
-const displayImages = [
-    props.originalImages[props.originalImages.length - 1], // clone最後一張
+// 使用 computed 让 displayImages 响应式更新
+const displayImages = computed(() => {
+  if (props.originalImages.length === 0) return []
+  
+  return [
+    props.originalImages[props.originalImages.length - 1], // clone最后一张
     ...props.originalImages,
-    props.originalImages[0], // 克隆第一張
-]
+    props.originalImages[0], // clone第一张
+  ]
+})
 
-const currentIndex = ref(1) // 初始從真正第一張開始
+const currentIndex = ref(1)
 const enableTransition = ref(true)
 const isTransitioning = ref(false)
 
-// 真正圖片索引（排除 clone）
+// 真正图片索引（排除 clone）
 const realIndex = computed(() => {
-    if (currentIndex.value === 0) return props.originalImages.length - 1
-    if (currentIndex.value === displayImages.length - 1) return 0
-    return currentIndex.value - 1
+  if (props.originalImages.length === 0) return 0
+  if (currentIndex.value === 0) return props.originalImages.length - 1
+  if (currentIndex.value === displayImages.value.length - 1) return 0
+  return currentIndex.value - 1
 })
 
-// 點擊圓點跳轉
+// 监听 props 变化，重置 currentIndex
+watch(() => props.originalImages, (newImages) => {
+  if (newImages.length > 0) {
+    currentIndex.value = 1
+    enableTransition.value = false
+  }
+}, { immediate: true })
+
+// 点击圆点跳转
 const goToSlide = (index) => {
-    if (isTransitioning.value) return
-    isTransitioning.value = true
-    enableTransition.value = true
-    currentIndex.value = index + 1
+  if (isTransitioning.value || props.originalImages.length === 0) return
+  isTransitioning.value = true
+  enableTransition.value = true
+  currentIndex.value = index + 1
 }
 
-// 過渡結束後做無縫跳轉
+// 过渡结束后做无缝跳转
 const handleTransitionEnd = () => {
-    isTransitioning.value = false
+  isTransitioning.value = false
 
-    // 跳回真正第一張
-    if (currentIndex.value === displayImages.length - 1) {
-        enableTransition.value = false
-        currentIndex.value = 1
-    }
+  if (displayImages.value.length === 0) return
 
-    // 跳回真正最後一張
-    if (currentIndex.value === 0) {
-        enableTransition.value = false
-        currentIndex.value = displayImages.length - 2
-    }
+  // 跳回真正第一张
+  if (currentIndex.value === displayImages.value.length - 1) {
+    enableTransition.value = false
+    currentIndex.value = 1
+  }
+
+  // 跳回真正最后一张
+  if (currentIndex.value === 0) {
+    enableTransition.value = false
+    currentIndex.value = displayImages.value.length - 2
+  }
 }
+
+let intervalId = null
 
 onMounted(() => {
-    setInterval(() => {
-        if (isTransitioning.value) return
-        isTransitioning.value = true
-        enableTransition.value = true
-        currentIndex.value += 1
-    }, 3000)
+  intervalId = setInterval(() => {
+    if (isTransitioning.value || props.originalImages.length === 0) return
+    isTransitioning.value = true
+    enableTransition.value = true
+    currentIndex.value += 1
+  }, 3000)
+})
+
+onUnmounted(() => {
+  if (intervalId) clearInterval(intervalId)
 })
 </script>
+
 <template>
   <div class="relative w-full overflow-hidden">
-    <div class="flex" :style="{
-      transform: `translateX(-${currentIndex * 100}%)`,
-      transition: enableTransition ? 'transform 1s ease-in-out' : 'none'
-    }" @transitionend="handleTransitionEnd">
+    <div 
+      v-if="displayImages.length > 0"
+      class="flex" 
+      :style="{
+        transform: `translateX(-${currentIndex * 100}%)`,
+        transition: enableTransition ? 'transform 1s ease-in-out' : 'none'
+      }" 
+      @transitionend="handleTransitionEnd"
+    >
       <img
         v-for="(image, index) in displayImages"
-        :key="index"
+        :key="`${image.id}-${index}`"
         :src="image.url"
         alt="carousel image"
         class="w-full shrink-0"
       />
     </div>
 
-    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 z-10">
+    <!-- 显示默认图片如果没有数据 -->
+    <div v-else class="w-full">
+      <img 
+        src="https://shoplineimg.com/62146b2be0f4410023ad65f9/67f2aa9508ec08000e25efae/2160x.webp?source_format=jpg" 
+        alt="默认图片" 
+        class="w-full"
+      />
+    </div>
+
+    <div v-if="originalImages && originalImages.length > 1" class="absolute bottom-2 left-1/2 -translate-x-1/2 z-10">
       <div class="flex justify-center space-x-2 mt-2">
         <span
           v-for="(_, index) in originalImages.length"
@@ -87,4 +124,3 @@ onMounted(() => {
     </div>
   </div>
 </template>
-

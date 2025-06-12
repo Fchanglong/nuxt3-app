@@ -1,6 +1,8 @@
 <script setup>
-import { useStepStore } from '~/stores/index.js'
-const store = useStepStore()
+// import { useStepStore } from '~/stores/index.js'
+// const store = useStepStore()
+import { useStore } from 'vuex'
+const store = useStore()
 const steps = [
     { label: '購物車', number: 1 },
     { label: '填寫資料', number: 2 },
@@ -35,7 +37,7 @@ const pasteHandle = async () => {
     }
 }
 onMounted(() => {
-    store.setCurrentStep(3)
+    store.dispatch('step/setCurrentStep', 3)
 })
 </script>
 <template>
