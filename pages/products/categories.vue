@@ -1,34 +1,14 @@
 <script setup>
-import { getCateCommoditiesApi, getCommodityByIdApi } from '~/api/commodify-api'
-const currentCategoryId = ref(null) // 添加当前选中的分类ID
-//獲取菜單
-const { data: menu } =await useAsyncData('cateCommodities', async () => {
-    const res = await getCateCommoditiesApi()
-    return res.data.CATE || []
-})
-//在获取到 menu 后再设置默认值
-if (menu.value && menu.value.length > 0) {
-    currentCategoryId.value = menu.value[0].cid
-}
+import { onMounted, watch } from 'vue'
+import { getCateCommoditiesMenuApi, getCommoditiesByIdApi } from '~/api/commodify-api'
+const currentCategoryId = ref(null)
+const menu = ref([])
+const products = ref([])
+const pending= ref(true)
 
-// 使用 useAsyncData 获取商品，响应 currentCategoryId 变化
-const { data: products, pending: productsLoading } = await useAsyncData(
-    () => `category-products-${currentCategoryId.value}`, // 动态 key
-    async () => {
-        if (!currentCategoryId.value) return []
-        const res = await getCommodityByIdApi(currentCategoryId.value)
-        return res.data || []
-    },
-    {
-        watch: [currentCategoryId], // 监听 currentCategoryId 变化
-        default: () => []
-    }
-)
-
-// 简化的切换分类函数
+// 切换分类函数
 const getCateCommodities = (cateId) => {
     currentCategoryId.value = cateId
-    // useAsyncData 会自动重新获取数据
 }
 const sortSeleteds = ref([
     { id: 1, name: '商品排序', value: '' },
@@ -41,22 +21,43 @@ const sortSeleteds = ref([
 const handleSort = (value) => {
     switch (value.value) {
         case 'new':
-            products.value.sort((a, b) => b.id - a.id)
+            products.value.sort((a, b) => b.oig_id - a.oig_id)
             break
         case 'old':
-            products.value.sort((a, b) => a.id - b.id)
+            products.value.sort((a, b) => a.oig_id - b.oig_id)
             break
         case 'lowToHigh':
-            products.value.sort((a, b) => a.currentPrice - b.currentPrice)
+            products.value.sort((a, b) => parseFloat(a.price_min) - parseFloat(b.price_min))
             break
         case 'highToLow':
-            products.value.sort((a, b) => b.currentPrice - a.currentPrice)
+            products.value.sort((a, b) => parseFloat(b.price_min) - parseFloat(a.price_min))
             break
         default:
-            // 默認排序，恢復原始順序
-            products.value.sort((a, b) => a.id - b.id)
+            products.value.sort((a, b) => a.oig_id - b.oig_id)
     }
 }
+// 提取初始化邏輯
+const initData = async () => {
+    const { data } = await getCateCommoditiesMenuApi()
+    menu.value = data.CATE || []
+    if (menu.value.length > 0) {
+        currentCategoryId.value = menu.value[0].cid
+        const res = await getCommoditiesByIdApi(currentCategoryId.value)
+        products.value = res.data || []
+    }
+    pending.value = false
+}
+watch(currentCategoryId, async (newVal) => {
+    if (newVal) {
+        pending.value = true
+        const res = await getCommoditiesByIdApi(newVal)
+        products.value = res.data || []
+        pending.value = false
+    }
+}, )
+onMounted(() => {
+    initData()
+})
 </script>
 
 <template>
@@ -67,22 +68,22 @@ const handleSort = (value) => {
                     <NuxtLink to="/products" class="font-bold text-2xl text-gray-500 ">全部商品</NuxtLink>
                     <span>></span>
                     <span v-for="item in menu" class="font-bold text-2xl cursor-pointer"
-                        :class="item.cid === currentCategoryId ? 'text-[#ac886b]' : 'text-gray-500'"
-                        :key="item.cid" @mouseover="getCateCommodities(item.cid)" @click="getCateCommodities(item.cid)">
+                        :class="item.cid === currentCategoryId ? 'text-[#ac886b]' : 'text-gray-500'" :key="item.cid"
+                        @mouseover="getCateCommodities(item.cid)" @click="getCateCommodities(item.cid)">
                         {{ item.cate_name }}
                     </span>
                 </div>
                 <Select :selects="sortSeleteds" @update:selected="handleSort" />
             </div>
-               <!-- 添加商品加载状态 -->
-            <div v-if="productsLoading" class="text-white text-center py-8">
+            <!-- 添加商品加载状态 -->
+            <div v-if="pending" class="text-white text-center py-8">
                 正在加载商品...
             </div>
             <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <li v-for="product in products" :key="product.oig_id"
                     class="bg-[#1d1a1a] cursor-pointer rounded-lg overflow-hidden ">
                     <NuxtLink :to="`/products/${product.oig_id}`">
-                        <div class="aspect-w-1 aspect-h-1">
+                        <div class="aspect-square min-w-[294px]">
                             <img :src="product.images" :alt="product.group_name" class="w-full h-full object-cover">
                         </div>
                         <div class="p-4 text-center">

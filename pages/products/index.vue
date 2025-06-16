@@ -1,31 +1,6 @@
 <script setup>
-import { useAsyncData } from 'nuxt/app'
-import { onMounted } from 'vue'
 import { getAllCommoditiesApi } from '~/api/commodify-api'
-// const products = ref([
-    //    {
-    //     id: 1,
-    //     name: '替換布套  (Joy Pro 智慧按摩椅墊 適用)',
-    //     ogPrice: 29900,
-    //     currentPrice: 19900,
-    //     imageUrl: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67ebaf31425acc000b9ea2e6/375x.webp?source_format=jpg'
-    // },
-    // {
-    //     oig_id: 1,
-    //     group_name: '替換布套  (Joy Pro 智慧按摩椅墊 適用)',
-    //     price_original_max: 29900,
-    //     price_min: 19900,
-    //     images: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67ebaf31425acc000b9ea2e6/375x.webp?source_format=jpg'
-    // }
-// ])
-
-// 使用 useAsyncData 
-const { data: products,  } = await useAsyncData('commodities', 
-  async () => {
-    const res = await getAllCommoditiesApi()
-    return res.data || []
-  }
-)
+const products = ref([])
 const sortSeleteds = ref([
     { id: 1, name: '商品排序', value: '' },
     { id: 2, name: '上架時間: 由新到舊', value: 'new' },
@@ -53,21 +28,24 @@ const handleSort = (value) => {
             products.value.sort((a, b) => a.id - b.id)
     }
 }
-
+onMounted(async () => {
+    const res = await getAllCommoditiesApi()
+    products.value = res.data || []
+})
 </script>
 
 <template>
     <div class="min-h-screen bg-[#1d1a1a]">
         <div class="max-w-7xl mx-auto px-4 py-8">
             <div class="flex justify-between mb-10 text-white ">
-                <span class="font-bold text-2xl">精選商品</span>
+                <span class="font-bold text-2xl">全部商品</span>
                 <Select :selects="sortSeleteds" @update:selected="handleSort" />
             </div>
             <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <li v-for="product in products" :key="product.oig_id"
                     class="bg-[#1d1a1a] cursor-pointer rounded-lg overflow-hidden ">
                     <NuxtLink :to="`/products/${product.oig_id}`">
-                        <div class="aspect-w-1 aspect-h-1">
+                        <div class="md:min-w-[300px] md:min-h-[300px] ">
                             <img :src="product.images" :alt="product.group_name" class="w-full h-full object-cover">
                         </div>
                         <div class="p-4 text-center">
@@ -81,5 +59,3 @@ const handleSort = (value) => {
         </div>
     </div>
 </template>
-
-<style scoped></style>

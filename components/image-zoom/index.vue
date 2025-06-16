@@ -91,7 +91,7 @@ const handleMouseMove = (event) => {
 </script>
 <template>
     <!-- 🖼️ 图片放大镜组件 - 鼠标跟随放大效果 -->
-    <div class="relative overflow-hidden rounded-lg border" :style="{ width: containerWidth, height: containerHeight }">
+    <div class="relative overflow-hidden rounded-lg border md:min-w-[425px] md:min-h-[425px]" :style="{ width: containerWidth, height: containerHeight }">
         <img ref="mainImageRef" class="w-full h-full object-cover cursor-crosshair transition-transform"
             :class="{ [`scale-${zoomScale}`]: isZooming }" :style="{
                 transitionDuration: `${transitionDuration}ms`,

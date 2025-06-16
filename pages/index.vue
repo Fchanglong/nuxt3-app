@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAsyncData } from "nuxt/app";
-import { getCateCommoditiesApi } from "~/api/commodify-api";
+import { getCateCommoditiesMenuApi } from "~/api/commodify-api";
 // const topCarousel = ref([
 //   {
 //     id: 1,
@@ -9,7 +9,7 @@ import { getCateCommoditiesApi } from "~/api/commodify-api";
 // ])
 
 const getCarouselImages = async () => {
-  const res = await getCateCommoditiesApi();
+  const res = await getCateCommoditiesMenuApi();
   return res.data.NEW.map(item => ({
     id: item.cid,
     url: item.images
@@ -98,7 +98,7 @@ const frequentAskList = ref([
 </script>
 <template>
   <div class=" overflow-x-hidden px-4 md:px-0">
-    <Carousel :originalImages="topCarousel" />
+    <Carousel :originalImages="topCarousel || []"  />
 
     <div class="w-full">
       <img :src="warrantyImgUrl" alt="" class="w-full" />

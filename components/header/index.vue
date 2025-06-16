@@ -244,18 +244,18 @@
             </li>
           </ul>
 
-          <NuxtLink
+          <!-- <NuxtLink
             to="/account/login"
             class="mobile-menu__link"
             @click="closeAll"
             >會員登入</NuxtLink
-          >
-          <NuxtLink
+          > -->
+          <!-- <NuxtLink
             to="/account/register"
             class="mobile-menu__link"
             @click="closeAll"
             >新用戶註冊</NuxtLink
-          >
+          > -->
           <NuxtLink to="/cart" class="mobile-menu__link" @click="closeAll"
             >購物車 ({{ cartCount }})</NuxtLink
           >
@@ -281,7 +281,7 @@ const checkScreen = () => {
 };
 onMounted(() => {
   checkScreen();
-  window.addEventListener("resize", checkScreen);
+  window.addEventListener("resize", checkScreen,{ passive: true });
 });
 
 // ==============================
@@ -316,7 +316,7 @@ const clickOutside = (elRef, callback) => {
     if (!elRef.value || elRef.value.contains(e.target)) return;
     callback();
   };
-  onMounted(() => window.addEventListener("click", handler));
+  onMounted(() => window.addEventListener("click", handler,{ passive: true }));
 };
 const langWrapper = ref(null);
 const curWrapper = ref(null);

@@ -1,4 +1,3 @@
-<!-- filepath: c:\Users\df-lytc\nuxt3-app\components\carousel\index.vue -->
 <script setup>
 const props = defineProps({
   originalImages: {
