@@ -1,4 +1,5 @@
-import { getCartApi, addCartApi } from "~/api/cart-api";
+import { getCartApi, addCartApi, delCartApi } from "~/api/cart-api";
+import { getCommoditySelectedSubApi } from "~/api/commodify-api";
 
 const state = () => ({
   items: [],
@@ -8,7 +9,7 @@ const state = () => ({
 
 const getters = {
   cartCount: (state) => {
-    return state.items.reduce((total, item) => total + item.quantity, 0);
+    return state.items.reduce((total, item) => total + item.num, 0);
   },
   isEmpty: (state) => {
     return state.items.length === 0;
@@ -55,9 +56,7 @@ const mutations = {
 };
 //異步 處理業務邏輯 調用 mutation修改 state
 const actions = {
-  // 添加到購物車（調用 API）
   async addToCart({ commit }, product) {
-    // 構建 API 需要的數據格式
     const cartData = {
       action: product.action,
       itemid: product.id,
@@ -65,20 +64,18 @@ const actions = {
       type: product.type,
       param: product.param,
     };
-
     //  調用 addCartApi 添加到購物車
     const res = await addCartApi(cartData);
-
     // 根據實際響應結構判斷成功
     if (res.result === true && res.el.type === "success") {
       //  成功後調用 getCartApi 獲取最新購物車數據
       const cartRes = await getCartApi();
-      if (cartRes.result === true || cartRes.code === 200) {
-        //  將最新數據更新到 Vuex
-        const cartItems = cartRes.item ? cartRes.item.slice(0, -1) : [];
-        commit("SET_CART", cartItems);
-      }
-      commit("TOGGLE_CART_MODAL"); // 顯示購物車彈窗
+      //  將最新數據更新到 Vuex
+      const cartItems = cartRes.item ? cartRes.item.slice(0, -1) : [];
+      commit("SET_CART", cartItems);
+    
+      // 顯示購物車彈窗
+      // commit("TOGGLE_CART_MODAL");
       return { success: true, message: res.el.message || "已加入購物車" };
     } else {
       return {
@@ -88,8 +85,23 @@ const actions = {
     }
   },
 
-  // 獲取購物車數據
-  async fetchCart({ commit }) {
+  async removeFromCart({ commit }, itemId) {
+    const items = await getCommoditySub(itemId);
+    const res = await delCartApi({
+      itemid: itemId,
+      param: items,
+    });
+    if (res.result === true && res.el.type === "success") {
+      // 成功後調用 getCartApi 獲取最新購物車數據
+      const cartRes = await getCartApi();
+      // 將最新數據更新到 Vuex
+      const cartItems = cartRes.item ? cartRes.item.slice(0, -1) : [];
+      commit("SET_CART", cartItems);
+    }
+  },
+
+  // 獲取最新購物車數據
+  async fetchLatestCart({ commit }) {
     try {
       commit("SET_LOADING", true);
       const res = await getCartApi();
@@ -101,10 +113,6 @@ const actions = {
     } finally {
       commit("SET_LOADING", false);
     }
-  },
-
-  removeFromCart({ commit }, itemId) {
-    commit("REMOVE_FROM_CART", itemId);
   },
 
   updateQuantity({ commit }, payload) {
@@ -130,4 +138,18 @@ export default {
   getters,
   mutations,
   actions,
+};
+//獲取商品選擇后的子商品信息
+const getCommoditySub = async (itemId) => {
+  const commodityInfo = await getCommoditySelectedSubApi(itemId);
+  const subArr = commodityInfo.data.sub?.map((subItem) => ({
+    item: subItem.isubid,
+    num: parseInt(subItem.num) || 0,
+  })) || [];
+  const subFreeArr = commodityInfo.data.sub_free?.map((subItem) => ({
+    item: subItem.isubid,
+    num: parseInt(subItem.num_free) || 0,
+  })) || [];
+  
+  return [...subArr, ...subFreeArr];
 };

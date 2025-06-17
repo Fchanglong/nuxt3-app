@@ -20,6 +20,6 @@ export const getCommodityByIdApi = (id) => {
 };
 
 //根據商品id獲取商品選擇后的信息
-export const getCommoditySelectInfoApi = (id) => {
+export const getCommoditySelectedSubApi = (id) => {
   return request(`/api1.0/oi/sub?itemid=${id}`);
 };

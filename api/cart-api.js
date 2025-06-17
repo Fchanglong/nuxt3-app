@@ -29,7 +29,9 @@ export const delCartApi = (data) => {
     body: {
       action: 'UPDATE',
       itemid: data.itemid,
-      number: 0
+      number: 0,
+      param: data.param || [],
+      type:'NOR'
     }
   });
 };

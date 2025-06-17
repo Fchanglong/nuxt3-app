@@ -1,35 +1,49 @@
 <script setup>
 import { useStore } from 'vuex'
-import { getCommodityByIdApi, getCommoditySelectInfoApi } from "~/api/commodify-api";
+import { getCommodityByIdApi, getCommoditySelectedSubApi } from "~/api/commodify-api";
 const route = useRoute()
 const id = String(route.params.id).trim()
 const count = ref(1)
 // 使用購物車 store
 const store = useStore()
 const productData = ref({})
-const selectedItemInfo = ref({})
+const selectedSub = ref({ sub: [], num: 0, sub_free: [], num_free: 0 })
 const selectedItem = ref(null)
 const selectedImage = ref('')
 const activeTab = ref('商品描述')
+const isVisible = ref(false)
 const tabs = [
     { name: '商品描述', key: 'desImg' },
     { name: '了解更多', key: 'knowMore' },
     { name: '送貨及付款方式', key: 'deliverAndPay' },
 ]
-const getcommoditySelectInfo = async (itemid) => {
-    if (!itemid) return // 添加安全檢查
-    const res = await getCommoditySelectInfoApi(itemid)
-    selectedItemInfo.value = res.data || {}
+//獲取選擇商品的子商品
+const getcommoditySelectedSub = async (itemid) => {
+    if (!itemid) return
+    try {
+        const res = await getCommoditySelectedSubApi(itemid)
+        // 確保數據結構完整
+        selectedSub.value = {
+            sub: res.data?.sub || [],
+            num: res.data?.num || 0,
+            sub_free: res.data?.sub_free || [],
+            num_free: res.data?.num_free || 0
+        }
+    } catch (error) {
+        console.error('獲取子商品失敗:', error)
+        // 設置默認值
+        selectedSub.value = { sub: [], num: 0, sub_free: [], num_free: 0 }
+    }
 }
 
 onMounted(async () => {
     const res = await getCommodityByIdApi(id)
     productData.value = res.data || {}
-    
+
     // 確保 productData 有數據且 items 存在後再調用
     if (productData.value?.items?.length > 0) {
         selectedItem.value = productData.value.items[0]
-        await getcommoditySelectInfo(selectedItem.value.itemid)
+        await getcommoditySelectedSub(selectedItem.value.itemid)
     }
 })
 watch(productData, (newData) => {
@@ -37,23 +51,22 @@ watch(productData, (newData) => {
         // 只在 selectedItem 还没有值时设置默认值
         if (!selectedItem.value) {
             selectedItem.value = newData.items[0]
+
         }
         // 只在 selectedImage 还没有值时设置默认值
         if (!selectedImage.value && newData.images) {
-            selectedImage.value = newData.images
+            selectedImage.value = newData.items[0].display_img_small
         }
     }
 }, { immediate: true, deep: true })
 
 // 处理规格选择
-const handleItemChange = (item) => {
+const handleItemChange = async (item) => {
+    await getcommoditySelectedSub(item.itemid)
     selectedItem.value = item
     selectedImage.value = item.display_img_small
 }
 
-const handleImageChange = (image) => {
-    selectedImage.value = image
-}
 // 获取所有描述图片/視頻
 const getDescImgAndVideo = computed(() => {
     if (!productData.value?.info?.desc) return []
@@ -73,28 +86,21 @@ const getDeliverAndPayInfo = computed(() => {
     return productData.value.info.delivery
 })
 // 添加到購物車的函數
-const addToCart = async () => {
- const subArr = selectedItemInfo.value.sub?.map(subItem => ({
-        item: subItem.isubid,
-        num: count.value * (parseInt(selectedItemInfo.value.num) || 0)
-    })) || []
-    
-    const subFreeArr = selectedItemInfo.value.sub_free?.map(subItem => ({
-        item: subItem.isubid,
-        num: count.value * (parseInt(selectedItemInfo.value.num_free) || 0)
-    })) || []
-    
-    subArr.push(...subFreeArr)
+const addToCart = async (selectedItems = []) => {
+    //判斷是否選擇了子商品
+   
     const product = {
         action: 'UPDATE',
         id: selectedItem.value.itemid,
         quantity: count.value,
-        param: subArr,
+        param: selectedItems,
         type: 'NOR'
     }
     try {
         const result = await store.dispatch('cart/addToCart', product)
         alert(result.message)
+        // 添加成功后关闭模态框
+        closeModal()
     } catch (error) {
         console.error('添加購物車失敗:', error)
     }
@@ -107,7 +113,7 @@ const handleCountChange = (action) => {
         count.value -= 1
     }
 }
-// 添加 YouTube URL 转换函数
+// YouTube URL 转换
 const convertToEmbedUrl = (desc) => {
     if (!desc || desc.content_type !== 'YOUTUBE') return desc
 
@@ -120,7 +126,37 @@ const convertToEmbedUrl = (desc) => {
     }
     return desc.content
 }
-
+// 千分號價格格式化
+const formatPrice = (price) => {
+    if (!price) return ''
+    return Number(price).toLocaleString()
+}
+const closeModal = () => {
+    isVisible.value = false
+}
+const openModal = () => {
+    isVisible.value = true
+}
+const handleAddToCart = async () => {
+    // 如果子商品數量大於1，則顯示模態框讓用戶選擇
+    if (selectedSub.value.sub.length > 1) {
+        isVisible.value = true
+        return
+    }
+    
+    // 如果只有一個或沒有子商品，直接添加到購物車
+    const selectedItems = [
+        ...selectedSub.value.sub.map(item => ({
+            item: item.isubid,
+            num: selectedSub.value.num
+        })),
+        ...selectedSub.value.sub_free.map(item => ({
+            item: item.isubid,
+            num: selectedSub.value.num_free
+        }))
+    ]
+    await addToCart(selectedItems)
+}
 </script>
 <template>
     <div class="p-10 w-full flex flex-col items-center">
@@ -130,10 +166,10 @@ const convertToEmbedUrl = (desc) => {
                 <div class="w-[120px] flex flex-col gap-2">
                     <img class="w-full object-cover cursor-pointer rounded-md border-2 transition-all duration-200 hover:scale-105"
                         :class="{
-                            'border-[#ac886b] shadow-md': image === selectedImage,
-                            'border-gray-300 hover:border-[#ac886b]': image !== selectedImage
-                        }" v-for="image in productData.items" :key="image" :src="image.display_img_small"
-                        @click="handleImageChange(image)" alt="产品缩略图">
+                            'border-[#ac886b] shadow-md': item.display_img_small === selectedImage,
+                            'border-gray-300 hover:border-[#ac886b]': item.display_img_small !== selectedImage
+                        }" v-for="item in productData.items" :key="item.name" :src="item.display_img_small"
+                        @click="handleItemChange(item)" alt="产品缩略图">
                 </div>
                 <!-- 放大镜组件 -->
                 <ImageZoom :image-src="selectedImage" container-width="100%" container-height="425px" zoom-scale="150"
@@ -151,10 +187,10 @@ const convertToEmbedUrl = (desc) => {
 
                 <div>
                     <span class="text-2xl font-bold text-[#ac886b] mr-3">
-                        HK${{ selectedItem?.price }}
+                        HK${{ formatPrice(selectedItem?.price) }}
                     </span>
                     <span class="text-gray-600 line-through">
-                        HK${{ selectedItem?.price_original }}
+                        HK${{ formatPrice(selectedItem?.price_original) }}
                     </span>
                 </div>
                 <!-- 規格選擇 -->
@@ -164,12 +200,29 @@ const convertToEmbedUrl = (desc) => {
                     </span>
                     <div class="flex gap-3 w-10">
                         <img class="border-[2px]  rounded-md cursor-pointer "
-                            :class="{ 'border-[#ac886b]': selectedImage === item.display_img_small }"
+                            :class="{ 'border-[#ac886b]': selectedItem.itemid === item.itemid }"
                             v-for="item in productData?.items" :key="item.itemid" :src="item.display_img_small"
                             @click="handleItemChange(item)" alt="">
                     </div>
                 </div>
-
+                <!-- 子商品 -->
+                <div class="h-[75px]">
+                    <span class="text-gray-500 text-sm font-semibold">
+                        子商品:
+                    </span>
+                    <div v-if="selectedSub.sub.length > 0" class="flex gap-3 cursor-pointer mt-2" @click="openModal">
+                        <div v-for="sub in selectedSub.sub" :key="sub.isubid" class="border p-2 rounded">
+                            <span>{{ sub.form_name }}</span>
+                        </div>
+                    </div>
+                    <div v-else class="text-gray-400 text-sm mt-2">
+                        此規格無子商品
+                    </div>
+                    <CommoditySubModal :isVisible :commoditySubs="selectedSub.sub"
+                        :commodityFreeSubs="selectedSub.sub_free" :subsNum="selectedSub?.num || 0" :selectNum="count"
+                        :freeSubsNum="selectedSub?.num_free || 0" :title="selectedItem?.name" @close="closeModal"
+                        @confirm="addToCart" />
+                </div>
                 <div class="text-3xl flex justify-center items-center gap-8 ">
                     <button @click="handleCountChange('reduce')" class="cursor-pointer">-</button>
                     <span class="text-xl">{{ count }}</span>
@@ -178,7 +231,7 @@ const convertToEmbedUrl = (desc) => {
 
                 <!-- 購買按鈕 -->
                 <div class="text-white font-medium text-xl flex gap-5">
-                    <button @click="addToCart" class="px-10 py-2.5 bg-[#ac886b]">加入購物車</button>
+                    <button @click="handleAddToCart" class="px-10 py-2.5 bg-[#ac886b]">加入購物車</button>
                     <NuxtLink to="/cart" class="px-10 py-2.5 bg-[#FD7812]">立即購買</NuxtLink>
                 </div>
             </div>

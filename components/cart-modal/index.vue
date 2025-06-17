@@ -1,39 +1,35 @@
 <script setup>
+import { watch } from 'vue'
 import { useStore } from 'vuex'
 const store = useStore()
 const cartModal = ref(null)
-const isToggleClick = ref(false)  // 新增：記錄是否是切換按鈕的點擊
 // 使用 computed 從 Vuex 獲取購物車狀態
 const isCartModalOpen = computed(() => store.getters['cart/isModalOpen'])
 const cartItems = computed(() => store.getters['cart/getItems'])
+watch(() => store.getters['cart/getItems'], (newItems) => {
+    if (newItems.length === 0) {
+        console.log(newItems);
+        
+    }
+}, { immediate: true })
 
 // 監聽商店的切換事件
 watch(() => isCartModalOpen.value, (isOpen) => {
-    if (isOpen) {
-        // 模態框剛被打開，標記為切換操作
-        isToggleClick.value = true
-        setTimeout(() => {
-            isToggleClick.value = false
-        }, 0)
+     if (isOpen) {
         // 禁止滾動
         const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
         document.body.style.overflow = 'hidden'
         document.body.style.paddingRight = `${scrollbarWidth}px`
     } else {
-        // 模態框關閉，恢復滾動
+        // 恢復滾動
         document.body.style.overflow = ''
         document.body.style.paddingRight = ''
     }
 })
 
 const handleClickOutside = (event) => {
-    // 如果是通過按鈕切換打開的，忽略這次點擊
-    if (isToggleClick.value) {
-        return
-    }
-
     if (cartModal.value && !cartModal.value.contains(event.target)) {
-        store.dispatch('cart/hideCartModal')
+        closeModal()
     }
 }
 
@@ -68,19 +64,20 @@ onBeforeUnmount(() => {
                 class="w-[360px] h-full md:h-fit bg-[#191919] fixed right-0 top-0 md:top-5 px-3 py-6 z-[1001] overflow-y-auto"
                 v-if="isCartModalOpen">
                 <ul v-if="cartItems.length" class=" space-y-3  md:min-h-[150px]">
-                    <li v-for="item in cartItems" :key="item.id">
+                    <li v-for="item in cartItems" :key="item.item_id">
                         <div class="flex gap-3 items-start justify-between">
-                            <img class="w-[88px] h-[88px] object-cover" :src="item.image" alt="">
+                            <img class="w-[88px] h-[88px] object-cover" :src="item.display_img_small" alt="">
                             <div class="flex flex-col flex-1">
-                                <h2 class=" font-bold text-gray-600">{{ item.name }}</h2>
-                                <span class="text-white font-semibold text-sm" v-if="item.selectedColor">
-                                    {{ item.selectedColor }}
-                                </span>
+                                <h2 class=" font-bold text-gray-600">{{ item.form_name }}</h2>
                                 <span class="text-white font-semibold ">
-                                    {{ item.quantity }} &times; HK$ {{ item.cuurentPrice }}
+                                    {{ item.num }} &times; HK$ {{ item.price }}
                                 </span>
+                                <span class="text-gray-500  text-xs" v-if="item.sub.length > 0">
+                                    子商品和贈品: {{ item.sub.map(sub => sub.form_name).join(', ') }}
+                                </span>
+                              
                             </div>
-                            <div class="text-white cursor-pointer" @click.stop="removeFromCart(item.id)">
+                            <div class="text-white cursor-pointer" @click.stop="removeFromCart(item.item_id)">
                                 &times;
                             </div>
                         </div>

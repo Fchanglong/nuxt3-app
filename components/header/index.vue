@@ -22,7 +22,7 @@
         <!-- <NuxtLink to="/cart" class="cart-link">
           🛒<span class="cart-count">{{ cartCount }}</span>
         </NuxtLink> -->
-          <button  class="cart-link " @click="toggleCartModal">
+          <button  class="cart-link " @click.stop="toggleCartModal">
             🛒<span class="cart-count">{{ cartCount }}</span>
           </button>
         <button
@@ -114,7 +114,7 @@
           <!-- <NuxtLink to="/cart" class="cart-link">
             🛒<span class="cart-count">{{ cartCount }}</span>
           </NuxtLink> -->
-            <button  class="cart-link " @click="toggleCartModal">
+            <button  class="cart-link " @click.stop="toggleCartModal">
             🛒<span class="cart-count">{{ cartCount }}</span>
           </button>
         </div>
@@ -270,7 +270,6 @@
 
 import { useStore } from 'vuex'
 const store = useStore()
-
 const toggleCartModal = () => store.dispatch('cart/toggleCartModal')
 // ==============================
 // 1. 响应式判断：宽度 ≥768px 为桌面端
