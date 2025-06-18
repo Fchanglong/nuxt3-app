@@ -1,13 +1,7 @@
 <script setup lang="ts">
-import { useAsyncData } from "nuxt/app";
+import { onMounted } from "vue";
 import { getCateCommoditiesMenuApi } from "~/api/commodify-api";
-// const topCarousel = ref([
-//   {
-//     id: 1,
-//     url: 'https://shoplineimg.com/62146b2be0f4410023ad65f9/67f2aa9508ec08000e25efae/2160x.webp?source_format=jpg',
-//   }
-// ])
-
+const topCarousel = ref([]);
 const getCarouselImages = async () => {
   const res = await getCateCommoditiesMenuApi();
   return res.data.NEW.map(item => ({
@@ -15,9 +9,10 @@ const getCarouselImages = async () => {
     url: item.images
   }));
 };
+onMounted(async () => {
+  topCarousel.value = await getCarouselImages();
+})
 
-// 在 useAsyncData 中使用这个函数
-const { data: topCarousel } = await useAsyncData('carouselImages', getCarouselImages);
 const bottomCarousel = [
   {
     id: 1,

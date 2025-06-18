@@ -4,7 +4,7 @@ import { getCateCommoditiesMenuApi, getCommoditiesByIdApi } from '~/api/commodif
 const currentCategoryId = ref(null)
 const menu = ref([])
 const products = ref([])
-const pending= ref(true)
+const pending = ref(true)
 
 // 切换分类函数
 const getCateCommodities = (cateId) => {
@@ -36,7 +36,7 @@ const handleSort = (value) => {
             products.value.sort((a, b) => a.oig_id - b.oig_id)
     }
 }
-// 提取初始化邏輯
+
 const initData = async () => {
     const { data } = await getCateCommoditiesMenuApi()
     menu.value = data.CATE || []
@@ -54,7 +54,7 @@ watch(currentCategoryId, async (newVal) => {
         products.value = res.data || []
         pending.value = false
     }
-}, )
+},)
 onMounted(() => {
     initData()
 })
@@ -65,14 +65,16 @@ onMounted(() => {
         <div class="max-w-7xl mx-auto px-4 py-8">
             <div class="flex justify-between mb-10 text-white ">
                 <div class="w-80 flex items-center gap-4">
-                    <NuxtLink to="/products" class="font-bold text-2xl text-gray-500 ">全部商品</NuxtLink>
+                    <NuxtLink to="/products" class="font-bold text-sm md:text-2xl text-gray-500 ">全部商品</NuxtLink>
                     <span>></span>
-                    <span v-for="item in menu" class="font-bold text-2xl cursor-pointer"
+                    <span v-for="item in menu" class="font-bold text-sm md:text-2xl cursor-pointer"
                         :class="item.cid === currentCategoryId ? 'text-[#ac886b]' : 'text-gray-500'" :key="item.cid"
                         @mouseover="getCateCommodities(item.cid)" @click="getCateCommodities(item.cid)">
                         {{ item.cate_name }}
                     </span>
                 </div>
+            </div>
+            <div class="text-white w-[20%] mb-4" > 
                 <Select :selects="sortSeleteds" @update:selected="handleSort" />
             </div>
             <!-- 添加商品加载状态 -->
@@ -80,6 +82,7 @@ onMounted(() => {
                 正在加载商品...
             </div>
             <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
                 <li v-for="product in products" :key="product.oig_id"
                     class="bg-[#1d1a1a] cursor-pointer rounded-lg overflow-hidden ">
                     <NuxtLink :to="`/products/${product.oig_id}`">

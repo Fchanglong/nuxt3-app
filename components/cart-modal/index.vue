@@ -6,12 +6,6 @@ const cartModal = ref(null)
 // 使用 computed 從 Vuex 獲取購物車狀態
 const isCartModalOpen = computed(() => store.getters['cart/isModalOpen'])
 const cartItems = computed(() => store.getters['cart/getItems'])
-watch(() => store.getters['cart/getItems'], (newItems) => {
-    if (newItems.length === 0) {
-        console.log(newItems);
-        
-    }
-}, { immediate: true })
 
 // 監聽商店的切換事件
 watch(() => isCartModalOpen.value, (isOpen) => {
@@ -61,7 +55,7 @@ onBeforeUnmount(() => {
         <!-- 購物車模態框 -->
         <Transition name="slide">
             <div ref="cartModal"
-                class="w-[360px] h-full md:h-fit bg-[#191919] fixed right-0 top-0 md:top-5 px-3 py-6 z-[1001] overflow-y-auto"
+                class="w-[70%] md:w-[360px] h-full md:h-fit bg-[#191919] fixed right-0 top-0 md:top-5 px-3 py-6 z-[1001] overflow-y-auto"
                 v-if="isCartModalOpen">
                 <ul v-if="cartItems.length" class=" space-y-3  md:min-h-[150px]">
                     <li v-for="item in cartItems" :key="item.item_id">

@@ -160,10 +160,10 @@ const handleAddToCart = async () => {
 </script>
 <template>
     <div class="p-10 w-full flex flex-col items-center">
-        <div class=" w-full md:w-[1100px] md:flex ">
+        <div class="w-full md:w-[1100px] md:flex-row flex flex-col gap-3 ">
             <div class="flex gap-4">
                 <!-- 缩略图列表 -->
-                <div class="w-[120px] flex flex-col gap-2">
+                <div class="hidden md:flex w-[120px] flex-col gap-2">
                     <img class="w-full object-cover cursor-pointer rounded-md border-2 transition-all duration-200 hover:scale-105"
                         :class="{
                             'border-[#ac886b] shadow-md': item.display_img_small === selectedImage,
@@ -177,7 +177,7 @@ const handleAddToCart = async () => {
             </div>
             <!-- 右邊部分 -->
             <div class="text-white flex flex-col md:w-[400px] ml-5 gap-4">
-                <span class="text-3xl font-bold">
+                <span class="text-xl md:text-3xl font-bold">
                     {{ productData?.group_name || productData?.name }}
                 </span>
                 <span class="text-sm">
@@ -230,9 +230,9 @@ const handleAddToCart = async () => {
                 </div>
 
                 <!-- 購買按鈕 -->
-                <div class="text-white font-medium text-xl flex gap-5">
-                    <button @click="handleAddToCart" class="px-10 py-2.5 bg-[#ac886b]">加入購物車</button>
-                    <NuxtLink to="/cart" class="px-10 py-2.5 bg-[#FD7812]">立即購買</NuxtLink>
+                <div class="text-white font-medium md:text-xl flex justify-center gap-5">
+                    <button @click="handleAddToCart" class="px-3 md:px-10 py-2.5 bg-[#ac886b]">加入購物車</button>
+                    <NuxtLink to="/cart" class="px-3 md:px-10 py-2.5 bg-[#FD7812]">立即購買</NuxtLink>
                 </div>
             </div>
         </div>

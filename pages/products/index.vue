@@ -39,6 +39,8 @@ onMounted(async () => {
         <div class="max-w-7xl mx-auto px-4 py-8">
             <div class="flex justify-between mb-10 text-white ">
                 <span class="font-bold text-2xl">全部商品</span>
+            </div>
+             <div class="text-white w-[20%] mb-4" > 
                 <Select :selects="sortSeleteds" @update:selected="handleSort" />
             </div>
             <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

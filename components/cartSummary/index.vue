@@ -3,10 +3,26 @@ const props = defineProps({
     cartItems: {
         type: Array,
         require: true
+    },
+    shippingFee: {
+        type: String,
+        default: '0'
+    },
+    totalPrice: {
+        type: String,
+        default: '0'
     }
 })
 const isOpen = ref(false)
 const cartRef = ref(null)
+// 計算小計
+const subtotal = computed(() => {
+    return props.cartItems.reduce((sum, item) => {
+        // 處理帶逗號的字符串
+        const cleanTotal = typeof item.total === 'string' ? item.total.replace(/,/g, '') : item.total
+        return sum + (parseFloat(cleanTotal) || 0)
+    }, 0)
+})
 const toggleCart = () => {
     const el = cartRef.value
     if (!el) return
@@ -23,7 +39,7 @@ const toggleCart = () => {
 <template>
     <div class="w-full border py-5 mt-10 overflow-hidden">
         <div class="flex flex-col items-center  text-xl ">
-            <h2 class=" font-bold">合計: NT$2,680</h2>
+            <h2 class=" font-bold">合計: {{ totalPrice }}</h2>
             <div @click="toggleCart" class="flex items-center gap-3 cursor-pointer">
                 <h2>購物車({{ cartItems.length }})</h2>
                 <span>
@@ -39,37 +55,42 @@ const toggleCart = () => {
         <!-- 購物車 -->
         <div ref="cartRef" class="transition-all duration-300 ease-in-out  max-h-0 opacity-0">
             <div class="w-full mx-auto  border rounded  mt-14">
-                <div class="  rounded overflow-hidden ">
+                <div class="rounded overflow-hidden ">
                     <!-- 表頭 -->
-                    <div class="grid grid-cols-6 font-bold  text-center py-3">
+                    <div class="hidden md:grid grid-cols-6 font-bold  text-center py-3">
                         <div class="col-span-2 text-start ml-4">商品資料</div>
-                        <div>優惠</div>
+                        <div>規格</div>
                         <div>單件價格</div>
                         <div>數量</div>
                         <div>小計</div>
                     </div>
                     <!-- 内容 -->
-                    <div v-for="item in cartItems" :key="item.id"
-                        class="grid grid-cols-6 items-center text-center border-t py-3">
+                    <div v-for="item in cartItems" :key="item.item_id"
+                        class="flex flex-col items-start md:grid grid-cols-6  text-center border-t py-3">
                         <div class="col-span-2 flex items-center gap-4 pl-4">
-                            <img :src="item.image" alt="" class="w-16 h-16 object-cover" />
+                            <img :src="item.display_img_small" alt="" class="w-16 h-16 object-cover" />
                             <div class="text-left">
-                                <div class="">{{ item.name }}</div>
-                                <div class="text-gray-500 text-sm">{{ item.color }}</div>
+                                <div class="">{{ item.form_name }}</div>
+                                <!-- <div class="text-gray-500 text-sm">{{ item.color }}</div> -->
                             </div>
                         </div>
-                        <div>-</div>
-                        <div>
-                            <div class="font-bold">NT${{ item.price }}</div>
-                            <div class="text-gray-400 line-through text-sm">NT${{ item.originalPrice }}</div>
+                        <div class="hidden md:flex flex-col text-sm text-gray-500">
+                            <span v-for="(spec, index) in item.sub" :key="index" :class="{
+                                'text-red-500': spec.sub_type === 'SFREE'
+                            }">
+                                {{ spec.sub_type === 'SFREE' ? '贈品:' : '' }}{{ spec.form_name }}&times;{{ spec.num }}
+                            </span>
                         </div>
                         <div>
-                            <div class="inline-flex items-center border rounded box-border">
-                                <span class="px-3">{{ item.quantity }}</span>
+                            <div class="font-bold">NT${{ item.price }}</div>
+                        </div>
+                        <div>
+                            <div class="inline-flex items-center box-border">
+                                <span class="px-3">{{ item.num }}</span>
                             </div>
                         </div>
                         <div class="flex items-center justify-center gap-2">
-                            <span class="font-bold">NT${{ item.price * item.quantity }}</span>
+                            <span class="font-bold">NT${{ item.total }}</span>
                         </div>
                     </div>
                 </div>
@@ -78,15 +99,17 @@ const toggleCart = () => {
             <div class="md:w-[730px] ml-auto mr-10 mt-10">
                 <div class="flex justify-between">
                     <span>小計:</span>
-                    <span>NT$880</span>
+                    <span>NT${{ subtotal }}</span>
                 </div>
                 <div class="flex justify-between">
                     <span>運費:</span>
-                    <span>NT$880</span>
+                    <span :class="{ 'text-red-500': shippingFee === '0' }">
+                        {{ shippingFee === '0' ? '免運費(滿$1000元免運費)' : `NT$${shippingFee}` }}
+                    </span>
                 </div>
                 <div class="flex justify-between font-bold">
                     <span>合計:</span>
-                    <span>NT$880</span>
+                    <span>NT${{ totalPrice }}</span>
                 </div>
             </div>
         </div>
