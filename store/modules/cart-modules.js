@@ -6,9 +6,9 @@ const state = () => ({
   items: [],
   isCartModalOpen: false,
   //運費
-  shipping: '0',
+  shipping: "0",
   //總計
-  total: '0',
+  total: "0",
 });
 
 const getters = {
@@ -83,19 +83,15 @@ const actions = {
     const res = await addCartApi(cartData);
     // 根據實際響應結構判斷成功
     if (res.result === true && res.el.type === "success") {
-      //  成功後調用 getCartApi 獲取最新購物車數據
-      const cartRes = await getCartApi();
       //  將最新數據更新到 Vuex
-      const cartItems = cartRes.item ? cartRes.item.slice(0, -1) : [];
-      commit("SET_CART", cartItems);
-
+      await updateCartData(commit);
       // 顯示購物車彈窗
       // commit("TOGGLE_CART_MODAL");
-      return { success: true, message: res.el.message || "已加入購物車" };
+      return { success: true, message:  "已加入購物車" };
     } else {
       return {
         success: false,
-        message: res.message || res.el.message || "加入購物車失敗",
+        message: res.message || "加入購物車失敗",
       };
     }
   },
@@ -107,24 +103,15 @@ const actions = {
       param: items,
     });
     if (res.result === true && res.el.type === "success") {
-      // 成功後調用 getCartApi 獲取最新購物車數據
-      const cartRes = await getCartApi();
       // 將最新數據更新到 Vuex
-      const cartItems = cartRes.item ? cartRes.item.slice(0, -1) : [];
-      commit("SET_CART", cartItems);
+      updateCartData(commit);
     }
   },
 
   // 獲取最新購物車數據
   async fetchLatestCart({ commit }) {
     try {
-      const res = await getCartApi();
-      const shipping = res.item[res.item.length - 1].total || '0';
-      const total = res.total || '0';
-      const cartItems = res.item ? res.item.slice(0, -1) : [];
-      commit("SET_SHIPPING", shipping);
-      commit("SET_TOTAL", total);
-      commit("SET_CART", cartItems);
+      updateCartData(commit);
     } catch (error) {
       console.error("獲取購物車失敗:", error);
     }
@@ -167,6 +154,27 @@ const getCommoditySub = async (itemId) => {
       item: subItem.isubid,
       num: parseInt(subItem.num_free) || 0,
     })) || [];
-
   return [...subArr, ...subFreeArr];
+};
+// 更新數據
+const updateCartData = async (commit) => {
+  try {
+    const res = await getCartApi();
+    // 添加安全檢查
+    const shipping =
+      res.item && res.item.length > 0
+        ? res.item[res.item.length - 1].total 
+        : "0";
+    const total = res.total || "0";
+    const cartItems = res.item && res.item.length > 1 ? res.item.slice(0, -1) : [];
+
+    commit("SET_SHIPPING", shipping);
+    commit("SET_TOTAL", total);
+    commit("SET_CART", cartItems);
+
+    return { success: true, data: { shipping, total, cartItems } };
+  } catch (error) {
+    console.error("更新購物車數據失敗:", error);
+    return { success: false, error };
+  }
 };

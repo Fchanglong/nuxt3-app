@@ -1,5 +1,6 @@
 <script setup>
 import { useStore } from 'vuex'
+import { saveOrderFormInfoApi } from '~/api/order-api'
 const store = useStore()
 const router = useRouter()
 const cartItems = computed(() => store.getters['cart/getItems'] || [])
@@ -12,6 +13,13 @@ const formInfo = reactive({
     address: '',
     note: ''
 })
+//發票表單信息
+const invoiceFormInfo = reactive({
+    company: '',
+    email: '',
+    identifier: '',
+    type: 1
+})
 const steps = [
     { label: '購物車', number: 1 },
     { label: '填寫資料', number: 2 },
@@ -21,11 +29,12 @@ const steps = [
 const formErrors = reactive({
     address: false,
     name: false,
-    phone: false
+    phone: false,
+    email: false
 })
 const invoiceTypes = ref([
-    { id: 1, name: '愛心捐贈', value: '' },
-    { id: 2, name: '寄送至郵箱', value: '' },
+    { id: 1, name: '愛心捐贈', type: 1 },
+    { id: 2, name: '寄送至郵箱', type: 2 },
 ])
 const InvoiceType = ref(invoiceTypes.value[0].name)
 // 驗證函數
@@ -33,24 +42,60 @@ const validateForm = () => {
     formErrors.address = !formInfo.address.trim()
     formErrors.name = !formInfo.name.trim()
     formErrors.phone = !formInfo.phone.trim()
-    return !formErrors.address && !formErrors.name && !formErrors.phone
+    //判斷發票類型是否為寄送至郵箱
+    formErrors.email = InvoiceType.value === '寄送至郵箱'
+        ? !invoiceFormInfo.email.trim()
+        : false
+
+    return !formErrors.address && !formErrors.name && !formErrors.phone && !formErrors.email
 }
 const getCurrentInvoiceType = (option) => {
+    invoiceFormInfo.type = option.type
     return InvoiceType.value = option.name
 }
-const submitOrder = () => {
+const submitOrder = async () => {
     if (!validateForm()) return
-    store.dispatch('order/updateOrderInfo', {
+    await store.dispatch('order/createOrder', {
         name: formInfo.name,
         phone: formInfo.phone,
         address: formInfo.address,
-        note: formInfo.note
+        note: formInfo.note,
+        email: invoiceFormInfo.email,
     })
-    router.push('/order')
+    store.dispatch('order/updateInvoiceFormInfo', {
+        type: invoiceFormInfo.type,
+        email: invoiceFormInfo.email,
+        identifier: invoiceFormInfo.identifier,
+        company: invoiceFormInfo.company
+    })
+    const { o } = store.getters['order/getOrderInfo']
+    if (o) {
+        // 確保有訂單號才跳轉
+        router.push(`/order/${o}`)
+    } else {
+        console.error('訂單號不存在')
+    }
+}
+// 防抖定時器變量
+let saveTimeout = null
+
+// 防抖
+const debouncedSaveOrderForm = (formData) => {
+    // 清除之前的定時器
+    if (saveTimeout) {
+        clearTimeout(saveTimeout)
+    }
+    // 設置新的定時器
+    saveTimeout = setTimeout(async () => {
+        try {
+            await saveOrderFormInfoApi(formData)
+        } catch (error) {
+            console.error('保存表單數據失敗:', error)
+        }
+    }, 500) // 500ms 延遲
 }
 const clearError = (fieldName) => {
     let fieldValue;
-
     switch (fieldName) {
         case 'name':
             fieldValue = formInfo.name;
@@ -61,23 +106,31 @@ const clearError = (fieldName) => {
         case 'address':
             fieldValue = formInfo.address;
             break;
+        case 'email':
+            fieldValue = invoiceFormInfo.email;
+            break;
         default:
             return;
     }
-
     if (fieldValue.trim()) {
         formErrors[fieldName] = false;
     }
+    debouncedSaveOrderForm({
+        address: formInfo.address,
+        name: formInfo.name,
+        phone: formInfo.phone,
+    })
 }
 
 onMounted(() => {
     // 從 store 獲取現有數據並初始化本地表單
-    const orderStoreInfo = store.getters['order/getOrderInfo']
+    const orderStoreInfo = store.getters['order/getOrderFormInfo']
     if (orderStoreInfo) {
         formInfo.name = orderStoreInfo.name || ''
         formInfo.phone = orderStoreInfo.phone || ''
         formInfo.address = orderStoreInfo.address || ''
         formInfo.note = orderStoreInfo.note || ''
+        formInfo.email = orderStoreInfo.email || ''
     }
     //獲取購物車商品
     store.dispatch('cart/fetchLatestCart')
@@ -99,7 +152,7 @@ onMounted(() => {
                 <div class=" w-full flex flex-col border mt-10  justify-center">
                     <div class="border w-full text-xl p-4 bg-gray-100 border-b flex justify-between">
                         <span class="">送貨資料</span>
-                        <span class="">運費: NT$1,800</span>
+                        <span class="">運費: {{ shippingFee === '0' ? '免運費' : `NT$${shippingFee}(滿$1000元免運費)` }}</span>
                     </div>
                     <div class="flex flex-col gap-3 px-3">
                         <div class="flex flex-col">
@@ -165,25 +218,30 @@ onMounted(() => {
                             <span>郵箱（選填）</span>
                             <span class="text-green-500 text-sm">*我們會將您的訂單通知信寄送至此。</span>
                         </div>
-                        <input type="text" placeholder="ex: example@gmail.com"
+                        <input v-model="invoiceFormInfo.email" type="text" placeholder="ex: example@gmail.com"
                             class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
                     </div>
                     <div v-else-if="InvoiceType === '寄送至郵箱'" class="">
                         <div class="p-3 space-y-1">
                             <span class="mb-3">收貨人名字</span>
-                            <input type="text"
+                            <input type="text" v-model="invoiceFormInfo.name"
                                 class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
                         </div>
                         <div class="p-3 space-y-1">
-                            <span class="mb-3">統一郵編（選填）</span>
-
-                            <input type="text"
+                            <span class="mb-3">統一編號（選填）</span>
+                            <input type="text" v-model="invoiceFormInfo.identifier"
                                 class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
                         </div>
                         <div class="p-3 space-y-1">
                             <span class="mb-3">郵箱（必填）</span>
-                            <input type="text" placeholder="ex: example@gmail.com"
-                                class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
+                            <div>
+                                <input v-model="invoiceFormInfo.email" type="text" placeholder="ex: example@gmail.com"
+                                    :class="{ 'border-red-500 ': formErrors.email }"
+                                    class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
+                                <div class="h-5 ">
+                                    <span v-if="formErrors.email" class="text-red-500 text-sm">{{ alertText }}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

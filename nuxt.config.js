@@ -12,7 +12,7 @@ export default defineNuxtConfig({
           target: "https://waca.lytc9988.uk",
           changeOrigin: true,
           secure: true,
-        },
+        }
       },
     },
   },

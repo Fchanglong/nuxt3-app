@@ -104,8 +104,6 @@ const handleConfirm = () => {
             })
         }
     })
-
-    console.log('Selected items:', selectedItems)
     emit('confirm', selectedItems)
 }
 

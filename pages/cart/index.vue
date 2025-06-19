@@ -1,6 +1,6 @@
 <script setup>
 import { useStore } from 'vuex'
-import { getLogisticsApi, getPaymentApi } from '~/api/order-api'
+import { getLogisticsApi, saveOrderFormInfoApi } from '~/api/order-api'
 const store = useStore()
 const router = useRouter()
 const cartItems = computed(() => store.getters['cart/getItems'] || [])
@@ -8,7 +8,7 @@ const shippingFee = computed(() => store.getters['cart/getShipping'] || 0)
 const totalPrice = computed(() => store.getters['cart/getTotal'] || 0)
 const address = ref('')
 const selectedDeliver = ref({})
-const selectedPay = ref({})
+const selectedPay = computed(() => store.getters['order/getSelectedPayment'] || {})
 const alertText = '內容不能為空'
 // 計算小計
 const subtotal = computed(() => {
@@ -32,11 +32,12 @@ const formErrors = reactive({
 const selectsDeliver = ref([
     { id: 1, name: '宅配', lkey: '' },
 ])
-const selectsPay = ref([])
+const selectsPay = computed(() => store.getters['order/getPaymentList'] || [])
+
 const removeItem = (id) => {
     store.dispatch('cart/removeFromCart', id)
 }
-// 增加數量
+// 增加或減少數量
 const changeQuantity = (item, type) => {
     // 計算新數量
     const newCount = type === 'add' ? item.num + 1 : item.num - 1
@@ -66,40 +67,51 @@ const getDeliver = async () => {
         lkey: item.lkey
     })))
 }
-const getPayment = async () => {
-    const { data } = await getPaymentApi()
-    selectsPay.value = data.map(item => ({
-        id: item.paymentid,
-        name: item.alias,
-        pay_mode: item.pay_mode
-    }))
-
-}
 const updateSelectsDeliver = (option) => {
     selectedDeliver.value = option
 }
 
 const updateSelectsPay = (option) => {
-    selectedPay.value = option
+    store.dispatch('order/updateSelectedPayment', option)
 }
 // 驗證函數
 const validateForm = () => {
     formErrors.address = !address.value.trim()
     formErrors.deliver = !selectedDeliver.value.name
     formErrors.payment = !selectedPay.value.name
-
     return !formErrors.address && !formErrors.deliver && !formErrors.payment
 }
+// 防抖定時器變量
+let saveTimeout = null
+
+// 防抖
+const debouncedSaveOrderForm = (formData) => {
+    // 清除之前的定時器
+    if (saveTimeout) {
+        clearTimeout(saveTimeout)
+    }
+    // 設置新的定時器
+    saveTimeout = setTimeout(async () => {
+        try {
+            await saveOrderFormInfoApi(formData)
+        } catch (error) {
+            console.error('保存表單數據失敗:', error)
+        }
+    }, 500) // 500ms 延遲
+}
 // 清除地址錯誤狀態的函數
-const clearAddressError = () => {
+const clearAddressError = async () => {
     if (address.value.trim()) {
         formErrors.address = false
     }
+    debouncedSaveOrderForm({
+        address: address.value,
+    })
 }
 const toCheckoutHandle = () => {
     // 驗證表單
     if (!validateForm()) return
-    store.dispatch('order/updateOrderInfo', {
+    store.dispatch('order/updateOrderFormInfo', {
         address: address.value,
     })
     router.push('/checkout')
@@ -108,7 +120,7 @@ onMounted(async () => {
     // 獲取物流信息
     await getDeliver()
     // 獲取支付方式
-    await getPayment()
+    store.dispatch('order/getPaymentList')
     //獲取購物車商品
     store.dispatch('cart/fetchLatestCart')
     //當前進度
@@ -185,8 +197,7 @@ onMounted(async () => {
                     </div>
                     <div>
                         <span>送貨地點</span>
-                        <input type="text" v-model="address" placeholder="收件地址"
-                            @input="clearAddressError"
+                        <input type="text" v-model="address" placeholder="收件地址" @input="clearAddressError"
                             :class="{ 'border-red-500 ': formErrors.address }"
                             class="border border-gray-300 rounded px-3 py-1 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
                         <div class="h-5 mt-1">
@@ -214,7 +225,7 @@ onMounted(async () => {
                         <div class="flex justify-between">
                             <span>運費:</span>
                             <span :class="{ 'text-red-500': shippingFee === '0' }">
-                                {{ shippingFee === '0' ? '免運費(滿$1000元免運費)' : `NT$${shippingFee}` }}
+                                {{ shippingFee === '0' ? '免運費' : `NT$${shippingFee}(滿$1000元免運費)` }}
                             </span>
                         </div>
                         <hr />
