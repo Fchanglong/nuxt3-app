@@ -109,7 +109,7 @@ const handleConfirm = () => {
 
 // 檢查是否可以確認（子商品就行）
 const canConfirm = computed(() => {
-    return subTotalSelected.value === props.subsNum
+    return subTotalSelected.value === subTotal.value
 })
 
 

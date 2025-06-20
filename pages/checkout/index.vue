@@ -37,6 +37,22 @@ const invoiceTypes = ref([
     { id: 2, name: '寄送至郵箱', type: 2 },
 ])
 const InvoiceType = ref(invoiceTypes.value[0].name)
+// 使用 computed 自動計算是否禁用
+const isAddressDisabled = computed(() => {
+    if (process.client) {
+        const logistics = sessionStorage.getItem('logistics')
+        if (logistics) {
+            try {
+                const logisticsData = JSON.parse(logistics)
+                return logisticsData.name === '速達快速到店'
+            } catch (e) {
+                console.error('解析物流信息失敗:', e)
+                return false
+            }
+        }
+    }
+    return false
+})
 // 驗證函數
 const validateForm = () => {
     formErrors.address = !formInfo.address.trim()
@@ -121,7 +137,6 @@ const clearError = (fieldName) => {
         phone: formInfo.phone,
     })
 }
-
 onMounted(() => {
     // 從 store 獲取現有數據並初始化本地表單
     const orderStoreInfo = store.getters['order/getOrderFormInfo']
@@ -182,7 +197,7 @@ onMounted(() => {
                     <div class="flex flex-col gap-3 px-3">
                         <span>地址</span>
                         <div>
-                            <input v-model="formInfo.address" @input="clearError('address')" type="text"
+                            <input :disabled="isAddressDisabled" v-model="formInfo.address" @input="clearError('address')" type="text"
                                 placeholder="地址" :class="{ 'border-red-500 ': formErrors.address }"
                                 class="border border-gray-300 rounded px-3 placeholder:text-sm py-1 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
                             <div class="h-5 mt-1">

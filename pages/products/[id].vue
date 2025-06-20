@@ -88,7 +88,7 @@ const getDeliverAndPayInfo = computed(() => {
 // 添加到購物車的函數
 const addToCart = async (selectedItems = []) => {
     //判斷是否選擇了子商品
-   
+
     const product = {
         action: 'UPDATE',
         id: selectedItem.value.itemid,
@@ -108,7 +108,7 @@ const addToCart = async (selectedItems = []) => {
 const handleCountChange = (action) => {
     if (action === 'add') {
         count.value += 1
-
+        // selectedSub.value.num=selectedSub.value.num * count.value
     } else if (action === 'reduce' && count.value > 1) {
         count.value -= 1
     }
@@ -143,7 +143,7 @@ const handleAddToCart = async () => {
         isVisible.value = true
         return
     }
-    
+
     // 如果只有一個或沒有子商品，直接添加到購物車
     const selectedItems = [
         ...selectedSub.value.sub.map(item => ({

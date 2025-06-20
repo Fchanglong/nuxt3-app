@@ -8,6 +8,10 @@ const props = defineProps({
     isOrder: {
         type: Boolean,
         default: false
+    },
+    initialValue: {
+        type: Object,
+        default: () => (null)
     }
 
 })
@@ -17,14 +21,22 @@ const isOpen = ref(false)
 const selectedOption = ref({})
 // 監聽 selects 變化，自動設置默認選項
 watch(() => props.selects, (newSelects) => {
-    if (newSelects && newSelects.length > 0 && newSelects[0]) {
-        // 只在沒有選中項或選中項無效時設置默認值
-        if (!selectedOption.value || !selectedOption.value.name) {
+    if (newSelects && newSelects.length > 0) {
+        // 只有在沒有選中項時才設置默認值
+        if (!props.initialValue) {
             selectedOption.value = newSelects[0]
             emit('update:selected', newSelects[0])
         }
     }
 }, { immediate: true })
+
+// 監聽 initialValue 變化
+watch(() => props.initialValue, (newValue) => {
+    if (newValue && newValue.name) {
+        selectedOption.value = newValue
+    }
+}, { immediate: true })
+
 const handleSelect = (option) => {
     selectedOption.value = option
     isOpen.value = false

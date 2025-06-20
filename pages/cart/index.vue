@@ -3,6 +3,7 @@ import { useStore } from 'vuex'
 import { getLogisticsApi, saveOrderFormInfoApi } from '~/api/order-api'
 const store = useStore()
 const router = useRouter()
+const route = useRoute()
 const cartItems = computed(() => store.getters['cart/getItems'] || [])
 const shippingFee = computed(() => store.getters['cart/getShipping'] || 0)
 const totalPrice = computed(() => store.getters['cart/getTotal'] || 0)
@@ -10,6 +11,25 @@ const address = ref('')
 const selectedDeliver = ref({})
 const selectedPay = computed(() => store.getters['order/getSelectedPayment'] || {})
 const alertText = '內容不能為空'
+
+// ✅ 新增：門店信息
+const selectedStoreAddress = ref({
+    storeid: '',
+    storename: '',
+    storeaddress: '',
+    outside: '',
+    ship: '',
+    TempVar: ''
+})
+
+// ✅ 新增：地圖選址相關數據
+const mapService = reactive({
+    ReturnUrl: '',
+    CustomerID: '8290209801',
+    postUrl: ''
+})
+
+
 // 計算小計
 const subtotal = computed(() => {
     return cartItems.value.reduce((sum, item) => {
@@ -37,16 +57,28 @@ const selectsPay = computed(() => store.getters['order/getPaymentList'] || [])
 const removeItem = (id) => {
     store.dispatch('cart/removeFromCart', id)
 }
+
+//  計算子商品原始規格的輔助函數
+const calculateOriginalSubs = (item) => {
+    const currentCount = item.num;
+    if (currentCount <= 0) return [];
+
+    return item.sub.map(subitem => ({
+        isubid: subitem.isubid,
+        originalNum: Math.round(subitem.num / currentCount)  // 每份的原始數量
+    }));
+}
 // 增加或減少數量
 const changeQuantity = (item, type) => {
     // 計算新數量
     const newCount = type === 'add' ? item.num + 1 : item.num - 1
     // 檢查邊界條件
     if (newCount < 1) return
+    const originalSubs = calculateOriginalSubs(item)
     // 構建子商品參數
-    const selectedItems = item.sub.map(subitem => ({
+    const selectedItems = originalSubs.map(subitem => ({
         item: subitem.isubid,
-        num: subitem.num * newCount
+        num: subitem.originalNum * newCount
     }))
     // 構建產品參數
     const product = {
@@ -69,6 +101,11 @@ const getDeliver = async () => {
 }
 const updateSelectsDeliver = (option) => {
     selectedDeliver.value = option
+    // 保存到 sessionStorage
+    if (process.client) {
+        sessionStorage.setItem('logistics', JSON.stringify(option))
+    }
+    address.value=''
 }
 
 const updateSelectsPay = (option) => {
@@ -116,7 +153,85 @@ const toCheckoutHandle = () => {
     })
     router.push('/checkout')
 }
+// 獲取選擇的物流信息
+const getLogistic = () => {
+    if (process.client) {
+        const logistics = sessionStorage.getItem('logistics')
+        if (!logistics) return false
+        selectedDeliver.value = JSON.parse(logistics)
+        return true
+    }
+}
+// 初始化地圖服務
+const initMapService = () => {
+    // mapService.ReturnUrl = window.location.href
+    mapService.ReturnUrl = `${window.location.origin}/map-callback`
+    if (process.client) {
+        if (window.innerWidth > 600) {
+            mapService.postUrl = 'https://appservice.ezcat.com.tw/Map.aspx'
+        } else {
+            mapService.postUrl = 'https://appservice.ezcat.com.tw/MobileMap.aspx'
+        }
+    }
+}
+// 處理地圖服務返回的數
+const handleMapCallback = () => {
+    if (route.query.fromMap === 'true') {
+        // 更新門店信息
+        selectedStoreAddress.value = {
+            storeid: route.query.storeid || '',
+            storename: decodeURIComponent(route.query.storename || ''),
+            storeaddress: decodeURIComponent(route.query.storeaddress || ''),
+            outside: route.query.outside || '',
+            ship: route.query.ship || '',
+            TempVar: route.query.TempVar || ''
+        }
+        // 保存到 sessionStorage
+        if (process.client) {
+            sessionStorage.setItem('addressData', JSON.stringify(selectedStoreAddress.value))
+        }
+        // 設置完整地址
+        if (selectedStoreAddress.value.storeaddress) {
+            address.value = `${selectedStoreAddress.value.storeid}-${selectedStoreAddress.value.storename}-${selectedStoreAddress.value.storeaddress}`
+            formErrors.address = false
+        }
+        router.replace('/cart')
+    }
+}
+// 恢復門店信息的函數
+const getSelectedStore = () => {
+    if(selectedDeliver.value.name !== '速達快速到店') return
+    if (process.client) {
+        const savedStore = sessionStorage.getItem('addressData')
+        if (savedStore) {
+            try {
+                const storeData = JSON.parse(savedStore)
+                selectedStoreAddress.value = storeData
+
+                // 如果有門店地址，自動設置到地址欄
+                if (storeData.storeaddress) {
+                    address.value = `${storeData.storeid}-${storeData.storename}-${storeData.storeaddress}`
+                    formErrors.address = false
+                }
+                return true
+            } catch (e) {
+                console.error('解析保存的門店信息失敗:', e)
+                return false
+            }
+        }
+    }
+    return false
+}
+
 onMounted(async () => {
+    // 恢復之前保存的物流信息選項
+    getLogistic()
+    // 恢復門店信息
+    getSelectedStore()
+    // 初始化地圖服務
+    initMapService()
+    // 處理地圖回調數據
+    handleMapCallback()
     // 獲取物流信息
     await getDeliver()
     // 獲取支付方式
@@ -125,6 +240,8 @@ onMounted(async () => {
     store.dispatch('cart/fetchLatestCart')
     //當前進度
     store.dispatch('step/setCurrentStep', 1)
+
+
 })
 </script>
 
@@ -192,14 +309,29 @@ onMounted(async () => {
                 <div class="flex flex-col gap-3 p-3">
                     <div>
                         <span>送貨方式</span>
-                        <Select :isOrder="true" :selects="selectsDeliver" @update:selected="updateSelectsDeliver" />
+                        <Select :isOrder="true" :selects="selectsDeliver" :initialValue="selectedDeliver"
+                            @update:selected="updateSelectsDeliver" />
                         <span class="text-gray-500 text-sm">下單後3個工作天內出貨，出貨後5-14個工作天內到貨</span>
                     </div>
-                    <div>
+                    <div class="md:h-[85px]">
                         <span>送貨地點</span>
-                        <input type="text" v-model="address" placeholder="收件地址" @input="clearAddressError"
-                            :class="{ 'border-red-500 ': formErrors.address }"
+                        <input v-if="selectedDeliver.name !== '速達快速到店'" type="text" v-model="address" placeholder="收件地址"
+                            @input="clearAddressError" :class="{ 'border-red-500 ': formErrors.address }"
                             class="border border-gray-300 rounded px-3 py-1 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
+                        <!-- ✅ 新增：地圖選址按鈕 -->
+                        <div class="flex gap-5" v-else>
+                            <form name="shop" method="post" :action="mapService.postUrl">
+                                <input name="ReturnUrl" type="hidden" v-model="mapService.ReturnUrl">
+                                <input name="CustomerID" type="hidden" v-model="mapService.CustomerID">
+                                <button type="submit"
+                                    class="px-3 py-2 bg-[#ac886b] text-white rounded hover:bg-[#8b5e3c] transition-colors  whitespace-nowrap">
+                                    選擇位址
+                                </button>
+                            </form>
+                            <input type="text" v-model="address" disabled
+                                class="border border-gray-300 rounded px-3 py-1 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
+                            <!-- ✅ 新增：地圖選址按鈕 -->
+                        </div>
                         <div class="h-5 mt-1">
                             <span v-if="formErrors.address" class="text-red-500 text-sm">{{ alertText }}</span>
                         </div>
