@@ -2,7 +2,7 @@ import {
   creatOrderApi,
   submitInvoiceApi,
   getPaymentApi,
-  submitPaymentApi,
+  submitPayModeApi,
 } from "@/api/order-api.js";
 const state = () => ({
   //訂單表單信息
@@ -69,14 +69,14 @@ const actions = {
     await submitInvoiceApi(orderInfo.o, invoiceInfo);
   },
   //提交支付信息
-  async submitPayment({ state }) {
+  async submitPayMode({ state }) {
     const orderInfo = state.orderInfo; // 獲取訂單信息
     const paymentInfo = state.selectedPayment; // 獲取支付信息
     const data = {
       order_num: orderInfo.o, // 訂單編號
       type: paymentInfo.pay_mode, // 支付方式
     };
-    await submitPaymentApi(data);
+    await submitPayModeApi(data);
   },
   //獲取支付方式
   async getPaymentList({ commit }) {

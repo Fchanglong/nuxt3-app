@@ -35,7 +35,7 @@ export const submitInvoiceApi = (o, data) => {
 };
 
 //提交支付信息
-export const submitPaymentApi = (data) => {
+export const submitPayModeApi = (data) => {
   return request(`/api0/cus/api/payment/pay-mode`, {
     method: "POST",
     body: data,
@@ -45,6 +45,11 @@ export const submitPaymentApi = (data) => {
 //獲取訂單詳情
 export const getOrderDetailApi = (o) => {
   return request(`/api1.0/order?order_num=${o}`);
+};
+
+//根據手機號獲得訂單號
+export const getOrderNumByPhoneApi = (phone) => {
+  return request(`/api1.0/order?phone=${phone}`);
 };
 
 //獲取提交支付后的支付返回地址

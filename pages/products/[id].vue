@@ -1,7 +1,9 @@
 <script setup>
 import { useStore } from 'vuex'
+import { toast } from 'vue-sonner'
 import { getCommodityByIdApi, getCommoditySelectedSubApi } from "~/api/commodify-api";
 const route = useRoute()
+const router = useRouter()
 const id = String(route.params.id).trim()
 const count = ref(1)
 // 使用購物車 store
@@ -88,7 +90,6 @@ const getDeliverAndPayInfo = computed(() => {
 // 添加到購物車的函數
 const addToCart = async (selectedItems = []) => {
     //判斷是否選擇了子商品
-
     const product = {
         action: 'UPDATE',
         id: selectedItem.value.itemid,
@@ -98,7 +99,6 @@ const addToCart = async (selectedItems = []) => {
     }
     try {
         const result = await store.dispatch('cart/addToCart', product)
-        alert(result.message)
         // 添加成功后关闭模态框
         closeModal()
     } catch (error) {
@@ -137,14 +137,13 @@ const closeModal = () => {
 const openModal = () => {
     isVisible.value = true
 }
-const handleAddToCart = async () => {
-    // 如果子商品數量大於1，則顯示模態框讓用戶選擇
+// 共用的加入購物車邏輯
+const processAddToCart = async (options = { redirectToCart: false, showToast: false }) => {
+    // 如果子商品數量大於1，顯示選擇模態框
     if (selectedSub.value.sub.length > 1) {
         isVisible.value = true
         return
     }
-
-    // 如果只有一個或沒有子商品，直接添加到購物車
     const selectedItems = [
         ...selectedSub.value.sub.map(item => ({
             item: item.isubid,
@@ -155,8 +154,28 @@ const handleAddToCart = async () => {
             num: selectedSub.value.num_free
         }))
     ]
+
     await addToCart(selectedItems)
+
+    if (options.showToast) {
+        toast.success('添加成功')
+    }
+
+    if (options.redirectToCart) {
+        router.push('/cart')
+    }
 }
+
+// 點擊加入購物車
+const handleAddToCart = () => {
+    processAddToCart({ showToast: true })
+}
+
+// 點擊立即購買
+const handleToCart = () => {
+    processAddToCart({ redirectToCart: true })
+}
+
 </script>
 <template>
     <div class="p-10 w-full flex flex-col items-center">
@@ -232,7 +251,7 @@ const handleAddToCart = async () => {
                 <!-- 購買按鈕 -->
                 <div class="text-white font-medium md:text-xl flex justify-center gap-5">
                     <button @click="handleAddToCart" class="px-3 md:px-10 py-2.5 bg-[#ac886b]">加入購物車</button>
-                    <NuxtLink to="/cart" class="px-3 md:px-10 py-2.5 bg-[#FD7812]">立即購買</NuxtLink>
+                    <button @click="handleToCart" class="px-3 md:px-10 py-2.5 bg-[#FD7812]">立即購買</button>
                 </div>
             </div>
         </div>

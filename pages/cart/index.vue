@@ -1,6 +1,7 @@
 <script setup>
 import { useStore } from 'vuex'
 import { getLogisticsApi, saveOrderFormInfoApi } from '~/api/order-api'
+import { toast } from 'vue-sonner'
 const store = useStore()
 const router = useRouter()
 const route = useRoute()
@@ -12,7 +13,7 @@ const selectedDeliver = ref({})
 const selectedPay = computed(() => store.getters['order/getSelectedPayment'] || {})
 const alertText = '內容不能為空'
 
-// ✅ 新增：門店信息
+// 門店信息
 const selectedStoreAddress = ref({
     storeid: '',
     storename: '',
@@ -22,7 +23,7 @@ const selectedStoreAddress = ref({
     TempVar: ''
 })
 
-// ✅ 新增：地圖選址相關數據
+// 地圖選址相關數據
 const mapService = reactive({
     ReturnUrl: '',
     CustomerID: '8290209801',
@@ -90,6 +91,7 @@ const changeQuantity = (item, type) => {
     }
     // 發送更新請求
     store.dispatch('cart/addToCart', product)
+    toast.success('操作成功')
 }
 const getDeliver = async () => {
     const { data } = await getLogisticsApi()
@@ -246,7 +248,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div v-if="cartItems.length > 0" class="bg-white py-10 md:px-20 px-5">
+         <div v-if="cartItems.length > 0" class="bg-white py-10 md:px-20 px-5">
         <!-- 進度條 -->
         <ProgressBar :steps />
         <!-- 購物車表格 -->
@@ -268,7 +270,6 @@ onMounted(async () => {
                         <img :src="item.display_img_small" alt="" class="w-16 h-16 object-cover" />
                         <div class="text-left">
                             <div class="">{{ item.form_name }}</div>
-                            <!-- <div class="text-gray-500 text-sm">{{ item.color }}</div> -->
                         </div>
                     </div>
                     <div class="hidden md:flex flex-col text-sm text-gray-500">
@@ -309,7 +310,7 @@ onMounted(async () => {
                 <div class="flex flex-col gap-3 p-3">
                     <div>
                         <span>送貨方式</span>
-                        <Select :isOrder="true" :selects="selectsDeliver" :initialValue="selectedDeliver"
+                        <Select :isOrder="true" :selects="selectsDeliver"  :initialValue="selectedDeliver"
                             @update:selected="updateSelectsDeliver" />
                         <span class="text-gray-500 text-sm">下單後3個工作天內出貨，出貨後5-14個工作天內到貨</span>
                     </div>

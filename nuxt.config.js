@@ -22,5 +22,4 @@ export default defineNuxtConfig({
   ],
   devtools: { enabled: true },
   ssr: true,
-  plugins: ["~/plugins/vuex.js"],
 });

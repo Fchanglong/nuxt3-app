@@ -23,7 +23,9 @@
           🛒<span class="cart-count">{{ cartCount }}</span>
         </NuxtLink> -->
           <button  class="cart-link " @click.stop="toggleCartModal">
-            🛒<span class="cart-count">{{ cartCount }}</span>
+            🛒<span class="cart-count">
+            <ClientOnly>{{ cartCount }}</ClientOnly>
+            </span>
           </button>
         <button
           class="main-nav__toggle"
@@ -115,7 +117,9 @@
             🛒<span class="cart-count">{{ cartCount }}</span>
           </NuxtLink> -->
             <button  class="cart-link " @click.stop="toggleCartModal">
-            🛒<span class="cart-count">{{ cartCount }}</span>
+            🛒<span class="cart-count">
+              <ClientOnly>{{ cartCount }}</ClientOnly>
+            </span>
           </button>
         </div>
       </nav>
@@ -256,10 +260,9 @@
             @click="closeAll"
             >新用戶註冊</NuxtLink
           > -->
-          <NuxtLink to="/cart" class="mobile-menu__link" @click="closeAll"
-            >購物車 ({{ cartCount }})</NuxtLink
-          >
-       
+          <NuxtLink to="/cart" class="mobile-menu__link" @click="closeAll">
+           <ClientOnly>購物車 ({{ cartCount }})</ClientOnly>
+          </NuxtLink>
         </nav>
       </div>
     </transition>

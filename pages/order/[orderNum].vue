@@ -1,12 +1,10 @@
 <script setup>
-import { reactive } from 'vue'
 import { useStore } from 'vuex'
 import { getOrderDetailApi, getPaymentReturnUrlApi, sendNotificationApi } from '~/api/order-api'
 const store = useStore()
 const route = useRoute()
- // 對應文件名 [orderNum].vue
-const orderNum = route.params.orderNum 
-
+// 對應文件名 [orderNum].vue
+const orderNum = route.params.orderNum
 const steps = [
     { label: '購物車', number: 1 },
     { label: '填寫資料', number: 2 },
@@ -20,6 +18,10 @@ const order = reactive({
     createDate: ''
 })
 const currentOrderStatus = ref('訂單處理中')
+const paymentObj = ref({})
+const isShowPayment = ref(false)
+// //判斷是否為創建訂單的頁面 （只有為創建訂單頁面，submitPayment【pay-mode】提交支付方式api才能執行）
+// const isCreateOrder = ref(false)
 const receiver = ref({
     name: '',
     email: '',
@@ -30,14 +32,10 @@ const payment = ref({
     pay_name: '',
     status_name: ''
 })
-// const bankInfo = ref({
-//     bankCode: 812,
-//     bankAccount: 9736061163416438
-// })
-// const isCopyed = ref(false)
+
 const orderInfo = computed(() => store.getters['order/getOrderInfo'] || {})
 const getOrderDetail = async () => {
-    const { data } = await getOrderDetailApi(orderInfo.value.o)
+    const { data } = await getOrderDetailApi(orderNum)
     cartItems.value = data[0].item.length > 1 ? data[0].item.slice(0, -1) : []
     totalPrice.value = data[0].total
     shippingFee.value = data[0].item[data[0].item.length - 1].price
@@ -53,6 +51,7 @@ const getSelectedPayment = async () => {
         order_num: orderInfo.value.o,
         redirect_f2e_href: window.location.href
     })
+    paymentObj.value = res
     payment.value.pay_name = res.pay_name
 }
 //給用戶發送消息
@@ -73,33 +72,63 @@ const getStatusName = (progressData) => {
     }
     return '訂單處理中' // 找不到時的默認值
 }
-// const pasteHandle = async () => {
-//     try {
-//         await navigator.clipboard.writeText(bankInfo.value.bankAccount.toString())
-//         isCopyed.value = true
-//         setTimeout(() => {
-//             isCopyed.value = false
-//         }, 5000)
-//     } catch (err) {
-//         console.error('複製失敗:', err)
-//         alert('複製失敗，請手動複製')
-//     }
-// }
+const checkPaymentWay = (paymentMethod) => {
+    switch (paymentMethod) {
+        case 'ReceivedPay':
+            return false
+            break
+        case 'CreditCard':
+            return true
+        case 'ATMTransfer':
+            return true
+        default:
+            return false
+    }
+}
+//提交支付表單
+const submitPayment = () => {
+    // 創建表單元素
+    const form = document.createElement('form')
+    form.method = 'POST'
+    form.action = paymentObj.value.furl
+    form.style.display = 'none'
+
+    // 添加所有表單字段
+    Object.entries(paymentObj.value.data_list).forEach(([key, value]) => {
+        const input = document.createElement('input')
+        input.type = 'hidden'
+        input.name = key
+        input.value = value
+        form.appendChild(input)
+    })
+
+    // 添加到頁面並提交
+    document.body.appendChild(form)
+    form.submit()
+    document.body.removeChild(form)
+}
+
 onMounted(async () => {
-    //獲取訂單詳情
-    await getOrderDetail()
-    // 提交發票
-    await store.dispatch('order/submitInvoice')
-    //更新購物車
-    await store.dispatch('cart/fetchLatestCart')
-    //發送通知
-    await sendNotification()
-    // 提交支付方式
-    await store.dispatch('order/submitPayment')
-    //獲取付款方式
-    await getSelectedPayment()
-    store.dispatch('step/setCurrentStep', 3)
+    try {
+        // 提交支付方式
+        // await store.dispatch('order/submitPayMode')
+    } catch (error) {
+        console.error(error)
+    } finally {
+        //獲取付款方式
+        await getSelectedPayment()
+        //獲取訂單詳情
+        await getOrderDetail()
+        // 提交發票
+        await store.dispatch('order/submitInvoice')
+        //更新購物車
+        await store.dispatch('cart/fetchLatestCart')
+        //發送通知
+        await sendNotification()
+        store.dispatch('step/setCurrentStep', 3)
+    }
 })
+
 </script>
 <template>
     <div class="bg-white py-10 md:px-20 px-5 w-full">
@@ -108,21 +137,36 @@ onMounted(async () => {
         <!-- 購物車 -->
         <CartSummary :cartItems :shippingFee :totalPrice />
         <div class="w-full flex flex-col border py-10 px-3 mt-10  justify-center ">
-            <!-- 成功提示 -->
-            <div class="py-10 flex items-center justify-center gap-6">
-                <svg width="88" height="93" viewBox="0 0 88 93" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="44" cy="46.5" r="40" fill="white" stroke="green" stroke-width="8" />
-                    <path d="M30 46L41 57L58 36" stroke="#007A33" stroke-width="6" stroke-linecap="round"
-                        stroke-linejoin="round" />
-                </svg>
-                <div class="flex flex-col gap-5">
-                    <div>
-                        <h2 class="text-xl font-bold">謝謝您！您的訂單已經成立！</h2>
-                        <span>訂單號碼 {{ order.orderNum }}</span>
+            <div class="flex flex-col items-center justify-center ">
+                <!-- 成功提示 -->
+                <div class="pb-10 flex items-center justify-center gap-6">
+                    <svg width="88" height="93" viewBox="0 0 88 93" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="44" cy="46.5" r="40" fill="white" stroke="green" stroke-width="8" />
+                        <path d="M30 46L41 57L58 36" stroke="#007A33" stroke-width="6" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    <div class="flex flex-col gap-5">
+                        <div>
+                            <h2 class="text-xl font-bold">謝謝您！您的訂單已經成立！</h2>
+                            <span>訂單號碼 {{ order.orderNum }}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span>訂單確認電郵已經發送到您的電子郵箱</span>
+                        </div>
                     </div>
-                    <div class="flex flex-col">
-                        <span>訂單確認電郵已經發送到您的電子郵箱</span>
-                    </div>
+                </div>
+                <div v-if="checkPaymentWay(paymentObj.mode)"
+                    class="bg-green-600 flex items-center 
+                      p-3 md:px-10 rounded-md text-white cursor-pointer hover:bg-green-700 transition-colors duration-300">
+                       <!-- 支付圖標 SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                    <button @click="submitPayment">
+                        前往支付
+                    </button>
                 </div>
             </div>
             <!-- 付費資訊 -->
@@ -142,20 +186,19 @@ onMounted(async () => {
                             </div>
                         </div>
                         <!-- 送貨資訊 -->
-                        <div>
+                        <div >
                             <h3 class="font-bold text-xl border-b pb-1 mb-2">送貨資訊</h3>
-                            <div class="grid grid-cols-[100px_1fr] gap-y-1">
-                                <span class="text-gray-600">收件人名稱:</span>
+                            <div class="grid grid-cols-[100px_1fr] gap-y-1 text-gray-600">
+                                <span >收件人名稱:</span>
                                 <span>{{ receiver.name }}</span>
-                                <span class="text-gray-600">收件人電話:</span>
+                                <span >收件人電話:</span>
                                 <span>{{ receiver.phone }}</span>
-                                <span class="text-gray-600">送貨方式:</span>
-                                <span>順豐快遞(台灣出貨香港)</span>
-                                <span class="text-gray-600">出貨狀態:</span>
+
+                                <span >出貨狀態:</span>
                                 <span>{{ currentOrderStatus }}</span>
-                                <span class="text-gray-600">送貨方式簡介:</span>
-                                <span>下單後3個工作天內出貨，出貨後5-14個工作天內到貨</span>
-                                <span class="text-gray-600">地址:</span>
+                                <span >送貨方式簡介:</span>
+                                <span >下單後3個工作天內出貨，出貨後5-14個工作天內到貨</span>
+                                <span >收件地址:</span>
                                 <span class="">{{ receiver.address }}</span>
                             </div>
                         </div>
@@ -194,10 +237,18 @@ onMounted(async () => {
                 </div>
             </div>
         </div>
-        <NuxtLink
-            class="block  p-3 bg-gray-500/20 text-center hover:bg-gray-600 hover:text-white transition-all duration-300"
-            to="/">
-            繼續購物
-        </NuxtLink>
+
+        <div class="flex flex-col gap-3 text-white mt-12">
+            <NuxtLink
+                class="block  p-3 bg-[#ac886b] text-center hover:bg-[#cc9f7b] hover:text-white transition-all duration-300"
+                to="/check_order">
+                查詢訂單
+            </NuxtLink>
+            <NuxtLink
+                class="block text-black  p-3 bg-gray-500/20 text-center hover:text-white hover:bg-gray-600 transition-all duration-300"
+                to="/">
+                繼續購物
+            </NuxtLink>
+        </div>
     </div>
 </template>

@@ -65,38 +65,75 @@ const toggleCart = () => {
                         <div>小計</div>
                     </div>
                     <!-- 内容 -->
-                    <div v-for="item in cartItems" :key="item.item_id"
-                        class="flex flex-col items-start md:grid grid-cols-6  text-center border-t py-3">
-                        <div class="col-span-2 flex items-center gap-4 pl-4">
-                            <img :src="item.display_img_small" alt="" class="w-16 h-16 object-cover" />
-                            <div class="text-left">
-                                <div class="">{{ item.form_name }}</div>
-                                <!-- <div class="text-gray-500 text-sm">{{ item.color }}</div> -->
+                    <div v-for="item in cartItems" :key="item.item_id" class="border-t py-4">
+                        <!-- 桌面端：grid 布局 -->
+                        <div class="hidden md:grid grid-cols-6 items-center text-center">
+                            <div class="col-span-2 flex items-center gap-4 pl-4">
+                                <img :src="item.display_img_small" alt="" class="w-16 h-16 object-cover" />
+                                <div class="text-left">
+                                    <div class="">{{ item.form_name }}</div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="hidden md:flex flex-col text-sm text-gray-500">
-                            <span v-for="(spec, index) in item.sub" :key="index" :class="{
-                                'text-red-500': spec.sub_type === 'SFREE'
-                            }">
-                                {{ spec.sub_type === 'SFREE' ? '贈品:' : '' }}{{ spec.form_name }}&times;{{ spec.num }}
-                            </span>
-                        </div>
-                        <div>
-                            <div class="font-bold">NT${{ item.price }}</div>
-                        </div>
-                        <div>
-                            <div class="inline-flex items-center box-border">
+                            <div class="flex flex-col text-sm text-gray-500">
+                                <span v-for="(spec, index) in item.sub" :key="index" :class="{
+                                    'text-red-500': spec.sub_type === 'SFREE'
+                                }">
+                                    {{ spec.sub_type === 'SFREE' ? '贈品:' : '' }}{{ spec.form_name }}&times;{{ spec.num
+                                    }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="font-bold">NT${{ item.price }}</span>
+                            </div>
+                            <div>
                                 <span class="px-3">{{ item.num }}</span>
                             </div>
+                            <div class="flex items-center justify-center">
+                                <span class="font-bold  ">NT${{ item.total }}</span>
+                            </div>
                         </div>
-                        <div class="flex items-center justify-center gap-2">
-                            <span class="font-bold">NT${{ item.total }}</span>
+
+                        <!-- 移動端：卡片式布局 -->
+                        <div class="md:hidden">
+                            <!-- 商品信息行 -->
+                            <div class="flex items-start gap-3 mb-3 pl-2">
+                                <img :src="item.display_img_small" alt="" class="w-16 h-16 object-cover rounded" />
+                                <div class="flex-1">
+                                    <div class="font-medium mb-1">{{ item.form_name }}</div>
+                                    <div class="text-sm text-gray-500 space-y-1">
+                                        <div v-for="(spec, index) in item.sub" :key="index" :class="{
+                                            'text-red-500': spec.sub_type === 'SFREE'
+                                        }">
+                                            {{ spec.sub_type === 'SFREE' ? '贈品:' : '' }}{{ spec.form_name }}&times;{{
+                                            spec.num }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 價格和數量信息行 -->
+                            <div class="flex items-center justify-between bg-gray-50 rounded-lg p-3">
+                                <div class="flex items-center gap-4">
+                                    <div class="text-center">
+                                        <div class="text-xs text-gray-500 mb-1">單價</div>
+                                        <div class="font-semibold text-sm">NT${{ item.price }}</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-xs text-gray-500 mb-1">數量</div>
+                                        <div class="font-semibold text-sm">{{ item.num }}</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs text-gray-500 mb-1">小計</div>
+                                    <div class="font-bold text-lg text-green-600">NT${{ item.total }}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <!-- 統計 -->
-            <div class="md:w-[730px] ml-auto mr-10 mt-10">
+            <div class="md:w-[730px] ml-auto mr-10  p-3 ">
                 <div class="flex justify-between">
                     <span>小計:</span>
                     <span>NT${{ subtotal }}</span>
@@ -109,7 +146,7 @@ const toggleCart = () => {
                 </div>
                 <div class="flex justify-between font-bold">
                     <span>合計:</span>
-                    <span>NT${{ totalPrice }}</span>
+                    <span class="text-xl text-green-600">NT${{ totalPrice }}</span>
                 </div>
             </div>
         </div>

@@ -85,6 +85,7 @@ const submitOrder = async () => {
         company: invoiceFormInfo.company
     })
     const { o } = store.getters['order/getOrderInfo']
+    await store.dispatch('order/submitPayMode')
     if (o) {
         // 確保有訂單號才跳轉
         router.push(`/order/${o}`)
@@ -154,122 +155,135 @@ onMounted(() => {
 })
 </script>
 <template>
-    <div class="bg-white py-10 md:px-20 px-5">
-        <!-- 進度條 -->
-        <ProgressBar :steps />
-        <!-- 購物車 -->
-        <CartSummary :cartItems :shippingFee :totalPrice />
-        <!-- 各種資料表單 -->
-        <div class="w-full md:flex justify-between gap-10">
-            <!-- 左部分 -->
-            <div class="flex-1">
-                <!-- 送貨資料 -->
-                <div class=" w-full flex flex-col border mt-10  justify-center">
-                    <div class="border w-full text-xl p-4 bg-gray-100 border-b flex justify-between">
-                        <span class="">送貨資料</span>
-                        <span class="">運費: {{ shippingFee === '0' ? '免運費' : `NT$${shippingFee}(滿$1000元免運費)` }}</span>
-                    </div>
-                    <div class="flex flex-col gap-3 px-3">
-                        <div class="flex flex-col">
-                            <span>收件人名稱</span>
+    <div>
+        <div v-if="cartItems.length > 0" class="bg-white py-10 md:px-20 px-5">
+            <!-- 進度條 -->
+            <ProgressBar :steps />
+            <!-- 購物車 -->
+            <CartSummary :cartItems :shippingFee :totalPrice />
+            <!-- 各種資料表單 -->
+            <div class="w-full md:flex justify-between gap-10">
+                <!-- 左部分 -->
+                <div class="flex-1">
+                    <!-- 送貨資料 -->
+                    <div class=" w-full flex flex-col border mt-10  justify-center">
+                        <div class="border w-full text-xl p-4 bg-gray-100 border-b flex justify-between">
+                            <span class="">送貨資料</span>
+                            <span class="">運費: {{ shippingFee === '0' ? '免運費' : `NT$${shippingFee}(滿$1000元免運費)`
+                                }}</span>
                         </div>
-                        <div>
-                            <input v-model="formInfo.name" @input="clearError('name')" type="text"
-                                :class="{ 'border-red-500 ': formErrors.name }"
-                                class="border border-gray-300 rounded px-3 py-1 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
-                            <span class="text-green-500 text-sm">*務必正確輸入購買人姓名確保正確送達</span>
-                            <div class="h-5 ">
-                                <span v-if="formErrors.name" class="text-red-500 text-sm">{{ alertText }}</span>
+                        <div class="flex flex-col gap-3 px-3">
+                            <div class="flex flex-col">
+                                <span>收件人名稱</span>
                             </div>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-1 px-3">
-                        <span>收件人電話號碼</span>
-                        <div>
-                            <input v-model="formInfo.phone" @input="clearError('phone')" type="text"
-                                :class="{ 'border-red-500 ': formErrors.phone }"
-                                class="border border-gray-300 rounded px-3 py-1 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
-                            <div class="h-5 mt-1">
-                                <span v-if="formErrors.phone" class="text-red-500 text-sm">{{ alertText }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-3 px-3">
-                        <span>地址</span>
-                        <div>
-                            <input :disabled="isAddressDisabled" v-model="formInfo.address" @input="clearError('address')" type="text"
-                                placeholder="地址" :class="{ 'border-red-500 ': formErrors.address }"
-                                class="border border-gray-300 rounded px-3 placeholder:text-sm py-1 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
-                            <div class="h-5 mt-1">
-                                <span v-if="formErrors.address" class="text-red-500 text-sm">{{ alertText }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- 訂單備注 -->
-                <div class=" w-full flex flex-col border mt-10  justify-center">
-                    <h2 class="border w-full text-xl p-4 bg-gray-100 border-b">訂單備註</h2>
-                    <div class="w-full p-3">
-                        <textarea placeholder="有什麽想告訴賣家的嗎？" v-model="formInfo.note"
-                            class="w-full border p-1 h-24 placeholder:text-sm focus:outline-none"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 右部分 -->
-            <div class="flex-1">
-                <!-- 索取發票 -->
-                <div class=" w-full flex flex-col border mt-10  justify-center">
-                    <div class="border w-full text-xl p-4 bg-gray-100 border-b flex justify-between">
-                        <span class="">索取發票</span>
-                    </div>
-                    <div class="p-3 space-y-1">
-                        <span class="mb-3">發票類型</span>
-                        <Select :selects="invoiceTypes" :isOrder="true"
-                            @update:selected="getCurrentInvoiceType"></Select>
-                    </div>
-                    <div v-if="InvoiceType === '愛心捐贈'" class="p-3 space-y-1">
-                        <div class="flex flex-col mb-3">
-                            <span>郵箱（選填）</span>
-                            <span class="text-green-500 text-sm">*我們會將您的訂單通知信寄送至此。</span>
-                        </div>
-                        <input v-model="invoiceFormInfo.email" type="text" placeholder="ex: example@gmail.com"
-                            class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
-                    </div>
-                    <div v-else-if="InvoiceType === '寄送至郵箱'" class="">
-                        <div class="p-3 space-y-1">
-                            <span class="mb-3">收貨人名字</span>
-                            <input type="text" v-model="invoiceFormInfo.name"
-                                class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
-                        </div>
-                        <div class="p-3 space-y-1">
-                            <span class="mb-3">統一編號（選填）</span>
-                            <input type="text" v-model="invoiceFormInfo.identifier"
-                                class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
-                        </div>
-                        <div class="p-3 space-y-1">
-                            <span class="mb-3">郵箱（必填）</span>
                             <div>
-                                <input v-model="invoiceFormInfo.email" type="text" placeholder="ex: example@gmail.com"
-                                    :class="{ 'border-red-500 ': formErrors.email }"
-                                    class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
+                                <input v-model="formInfo.name" @input="clearError('name')" type="text"
+                                    :class="{ 'border-red-500 ': formErrors.name }"
+                                    class="border border-gray-300 rounded px-3 py-1 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
+                                <span class="text-green-500 text-sm">*務必正確輸入購買人姓名確保正確送達</span>
                                 <div class="h-5 ">
-                                    <span v-if="formErrors.email" class="text-red-500 text-sm">{{ alertText }}</span>
+                                    <span v-if="formErrors.name" class="text-red-500 text-sm">{{ alertText
+                                        }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-1 px-3">
+                            <span>收件人電話號碼</span>
+                            <div>
+                                <input v-model="formInfo.phone" @input="clearError('phone')" type="text"
+                                    :class="{ 'border-red-500 ': formErrors.phone }"
+                                    class="border border-gray-300 rounded px-3 py-1 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
+                                <div class="h-5 mt-1">
+                                    <span v-if="formErrors.phone" class="text-red-500 text-sm">{{ alertText
+                                        }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-3 px-3">
+                            <span>地址</span>
+                            <div>
+                                <input :disabled="isAddressDisabled" v-model="formInfo.address"
+                                    @input="clearError('address')" type="text" placeholder="地址"
+                                    :class="{ 'border-red-500 ': formErrors.address }"
+                                    class="border border-gray-300 rounded px-3 placeholder:text-sm py-1 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
+                                <div class="h-5 mt-1">
+                                    <span v-if="formErrors.address" class="text-red-500 text-sm">{{ alertText
+                                        }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <!-- 訂單備注 -->
+                    <div class=" w-full flex flex-col border mt-10  justify-center">
+                        <h2 class="border w-full text-xl p-4 bg-gray-100 border-b">訂單備註</h2>
+                        <div class="w-full p-3">
+                            <textarea placeholder="有什麽想告訴賣家的嗎？" v-model="formInfo.note"
+                                class="w-full border p-1 h-24 placeholder:text-sm focus:outline-none"></textarea>
+                        </div>
+                    </div>
                 </div>
 
-            </div>
-        </div>
-        <div class="w-full border flex py-10 px-5">
-            <NuxtLink to="/cart" class="text-blue-400 flex-1 flex items-center ">
-                < 返回購物車 </NuxtLink>
-                    <div @click="submitOrder"
-                        class="bg-[#ac886b] cursor-pointer text-center flex-1 py-2 text-white rounded-sm w-full">
-                        提交訂單
+                <!-- 右部分 -->
+                <div class="flex-1">
+                    <!-- 索取發票 -->
+                    <div class=" w-full flex flex-col border mt-10  justify-center">
+                        <div class="border w-full text-xl p-4 bg-gray-100 border-b flex justify-between">
+                            <span class="">索取發票</span>
+                        </div>
+                        <div class="p-3 space-y-1">
+                            <span class="mb-3">發票類型</span>
+                            <Select :selects="invoiceTypes" :isOrder="true"
+                                @update:selected="getCurrentInvoiceType"></Select>
+                        </div>
+                        <div v-if="InvoiceType === '愛心捐贈'" class="p-3 space-y-1">
+                            <div class="flex flex-col mb-3">
+                                <span>郵箱（選填）</span>
+                                <span class="text-green-500 text-sm">*我們會將您的訂單通知信寄送至此。</span>
+                            </div>
+                            <input v-model="invoiceFormInfo.email" type="text" placeholder="ex: example@gmail.com"
+                                class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
+                        </div>
+                        <div v-else-if="InvoiceType === '寄送至郵箱'" class="">
+                            <div class="p-3 space-y-1">
+                                <span class="mb-3">收貨人名字</span>
+                                <input type="text" v-model="invoiceFormInfo.name"
+                                    class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
+                            </div>
+                            <div class="p-3 space-y-1">
+                                <span class="mb-3">統一編號（選填）</span>
+                                <input type="text" v-model="invoiceFormInfo.identifier"
+                                    class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
+                            </div>
+                            <div class="p-3 space-y-1">
+                                <span class="mb-3">郵箱（必填）</span>
+                                <div>
+                                    <input v-model="invoiceFormInfo.email" type="text"
+                                        placeholder="ex: example@gmail.com"
+                                        :class="{ 'border-red-500 ': formErrors.email }"
+                                        class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
+                                    <div class="h-5 ">
+                                        <span v-if="formErrors.email" class="text-red-500 text-sm">{{ alertText
+                                            }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                </div>
+            </div>
+            <div class="w-full border flex py-10 px-5">
+                <NuxtLink to="/cart" class="text-blue-400 flex-1 flex items-center ">
+                    < 返回購物車 </NuxtLink>
+                        <div @click="submitOrder"
+                            class="bg-[#ac886b] cursor-pointer text-center flex-1 py-2 text-white rounded-sm w-full">
+                            提交訂單
+                        </div>
+            </div>
+
+        </div>
+        <div v-else class="flex items-center justify-center h-screen">
+            <span class="text-gray-500 text-xl">購物車内沒有商品</span>
         </div>
     </div>
 </template>

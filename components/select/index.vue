@@ -22,8 +22,15 @@ const selectedOption = ref({})
 // 監聽 selects 變化，自動設置默認選項
 watch(() => props.selects, (newSelects) => {
     if (newSelects && newSelects.length > 0) {
-        // 只有在沒有選中項時才設置默認值
-        if (!props.initialValue) {
+        // 如果有 initialValue，優先使用 initialValue
+        if (props.initialValue) {
+            selectedOption.value = props.initialValue
+            // 不要觸發 emit，因為這是初始化，不是用戶選擇
+            return
+        }
+        
+        // 只有在沒有選中項且沒有 initialValue 時才設置默認值
+        if (Object.keys(selectedOption.value).length === 0) {
             selectedOption.value = newSelects[0]
             emit('update:selected', newSelects[0])
         }
