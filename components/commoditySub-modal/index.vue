@@ -79,8 +79,6 @@ const canReduceSub = (itemId) => {
     return (subCounts.value[itemId] || 0) > 0 && props.commoditySubs.length !== 1
 }
 
-
-
 // 确认选择时，发送选择的商品和数量
 const handleConfirm = () => {
     const selectedItems = []
@@ -142,20 +140,21 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="fixed inset-0 bg-black/50 text-black z-[1000] flex items-center justify-center" v-if="isVisible"
-        @click="handleOverlayClick">
-        <Transition name="modal">
-            <div v-if="isVisible"
-                class="border min-w-[500px] min-h-96 bg-white p-4 rounded-lg  mb-44">
+    <div class="fixed inset-0 bg-black/50  z-[1000] flex items-center justify-center " v-if="isVisible"></div>
+    <Transition name="subModal">
+        <div class="fixed  inset-0 text-black z-[1000] flex items-center justify-center" v-if="isVisible"
+            @click="handleOverlayClick">
+            <div class="border md:min-w-[500px] md:min-h-96 bg-white p-4 rounded-lg  mb-44">
                 <div class="flex flex-col gap-4 min-h-96">
                     <h1 class="text-lg font-bold">{{ title }}</h1>
                     <hr>
                     <!-- 子商品区域 -->
                     <div v-if="commoditySubs.length > 0">
                         <h2 class="text-xl mb-2">請選擇 {{ subTotal }} 件子商品 (已選: {{ subTotalSelected }})</h2>
-                        <div class="space-y-3 max-h-48 overflow-y-auto">
+                        <div class="space-y-3 max-h-48 overflow-y-auto pb-2">
                             <div v-for="item in commoditySubs" :key="'sub-' + item.isubid"
-                                class="flex items-center justify-between p-4 border border-gray-200 rounded-lg shadow-md bg-white hover:shadow-lg transition-all duration-200 hover:border-gray-300">
+                                class="flex items-center justify-between p-4 border border-gray-200 rounded-lg shadow-md 
+                                bg-white hover:shadow-lg transition-all duration-200 hover:border-gray-300">
                                 <span class="flex-1">{{ item.form_name }}</span>
                                 <div class="flex items-center gap-2">
                                     <button @click="handleSubCountChange(item.isubid, 'reduce')"
@@ -172,7 +171,7 @@ onBeforeUnmount(() => {
                                         :disabled="!canAddSub(item.isubid)" :class="[
                                             'w-8 h-8 rounded-sm border',
                                             canAddSub(item.isubid)
-                                                ? 'bg-blue-100 hover:bg-blue-200 cursor-pointer'
+                                                ? 'bg-[#e0c3ab] hover:bg-[#d4a884] cursor-pointer'
                                                 : 'bg-gray-50 text-gray-400 cursor-not-allowed'
                                         ]">
                                         +
@@ -193,14 +192,14 @@ onBeforeUnmount(() => {
                         </div>
                     </div>
                     <!-- 操作按鈕 -->
-                    <div class="flex gap-2 mt-auto">
-                        <button @click="$emit('close')" class="flex-1 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                    <div class="flex gap-2 mt-auto text-sm md:text-base ">
+                        <button @click="$emit('close')" class=" transition-all duration-200 flex-1 px-2 py-1 md:px-4 md:py-2 bg-gray-300 rounded hover:bg-gray-400">
                             取消
                         </button>
                         <button @click="handleConfirm" :disabled="!canConfirm" :class="[
-                            'flex-1 px-4 py-2 rounded text-white',
+                            'flex-1 md:px-4 md:py-2 rounded text-white px-2 py-1 transition-all duration-200',
                             canConfirm
-                                ? 'bg-blue-500 hover:bg-blue-600 cursor-pointer'
+                                ? 'bg-[#ac886b] hover:bg-[#8d6748] cursor-pointer'
                                 : 'bg-gray-400 cursor-not-allowed'
                         ]">
                             確認 (子商品: {{ subTotalSelected }}/{{ subTotal }})
@@ -208,25 +207,25 @@ onBeforeUnmount(() => {
                     </div>
                 </div>
             </div>
-        </Transition>
-    </div>
+        </div>
+    </Transition>
 </template>
 
 <style scoped>
-.modal-enter-active,
-.modal-leave-active {
-    transition: all 0.3s ease;
+.subModal-enter-active,
+.subModal-leave-active {
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.modal-enter-from,
-.modal-leave-to {
+.subModal-enter-from,
+.subModal-leave-to {
+    transform: scale(0.1);
     opacity: 0;
-    transform: scale(0.9);
 }
 
-.modal-enter-to,
-.modal-leave-from {
-    opacity: 1;
+.subModal-enter-to,
+.subModal-leave-from {
     transform: scale(1);
+    opacity: 1;
 }
 </style>

@@ -14,6 +14,7 @@ const selectedItem = ref(null)
 const selectedImage = ref('')
 const activeTab = ref('商品描述')
 const isVisible = ref(false)
+const isBuyNow = ref(false)
 const tabs = [
     { name: '商品描述', key: 'desImg' },
     { name: '了解更多', key: 'knowMore' },
@@ -89,18 +90,33 @@ const getDeliverAndPayInfo = computed(() => {
 })
 // 添加到購物車的函數
 const addToCart = async (selectedItems = []) => {
+    // 獲取 sessionStorage 中的購物車數據
+    const vuexData = JSON.parse(sessionStorage.getItem('vuex')) || { items: [] };
+    const cartData = vuexData.cart || { items: [] };
+    // 查找是否已存在相同的產品
+    const existingItem = cartData.items.find(item => item.item_id === selectedItem.value.itemid);
+    // 計算新的數量
+    const newQuantity = count.value + (existingItem ? existingItem.num : 0);
+    //給子商品也乘上newQuantity
+    selectedItems.forEach(item => {
+        item.num *= newQuantity
+    })
     //判斷是否選擇了子商品
     const product = {
         action: 'UPDATE',
         id: selectedItem.value.itemid,
-        quantity: count.value,
+        quantity: newQuantity,
         param: selectedItems,
         type: 'NOR'
     }
     try {
-        const result = await store.dispatch('cart/addToCart', product)
+        await store.dispatch('cart/addToCart', product)
+        // 如果是立即購買，跳轉到購物車頁面
+        if (isBuyNow.value) router.push('/cart')
+        toast.success('添加成功')
         // 添加成功后关闭模态框
         closeModal()
+        isBuyNow.value = false
     } catch (error) {
         console.error('添加購物車失敗:', error)
     }
@@ -138,10 +154,11 @@ const openModal = () => {
     isVisible.value = true
 }
 // 共用的加入購物車邏輯
-const processAddToCart = async (options = { redirectToCart: false, showToast: false }) => {
+const processAddToCart = async (buyNow) => {
     // 如果子商品數量大於1，顯示選擇模態框
     if (selectedSub.value.sub.length > 1) {
         isVisible.value = true
+        isBuyNow.value = buyNow
         return
     }
     const selectedItems = [
@@ -154,26 +171,20 @@ const processAddToCart = async (options = { redirectToCart: false, showToast: fa
             num: selectedSub.value.num_free
         }))
     ]
-
     await addToCart(selectedItems)
-
-    if (options.showToast) {
-        toast.success('添加成功')
-    }
-
-    if (options.redirectToCart) {
+    if (buyNow) {
         router.push('/cart')
     }
 }
 
 // 點擊加入購物車
 const handleAddToCart = () => {
-    processAddToCart({ showToast: true })
+    processAddToCart()
 }
 
 // 點擊立即購買
 const handleToCart = () => {
-    processAddToCart({ redirectToCart: true })
+    processAddToCart(true)
 }
 
 </script>
@@ -204,6 +215,7 @@ const handleToCart = () => {
                 </span>
                 <hr>
 
+
                 <div>
                     <span class="text-2xl font-bold text-[#ac886b] mr-3">
                         HK${{ formatPrice(selectedItem?.price) }}
@@ -225,12 +237,12 @@ const handleToCart = () => {
                     </div>
                 </div>
                 <!-- 子商品 -->
-                <div class="h-[75px]">
+                <div class="md:h-[75px]">
                     <span class="text-gray-500 text-sm font-semibold">
                         子商品:
                     </span>
-                    <div v-if="selectedSub.sub.length > 0" class="flex gap-3 cursor-pointer mt-2" @click="openModal">
-                        <div v-for="sub in selectedSub.sub" :key="sub.isubid" class="border p-2 rounded">
+                    <div v-if="selectedSub.sub.length > 0" class="flex gap-3  mt-2" @click="openModal">
+                        <div v-for="sub in selectedSub.sub" :key="sub.isubid" class="border p-2 rounded cursor-pointer">
                             <span>{{ sub.form_name }}</span>
                         </div>
                     </div>

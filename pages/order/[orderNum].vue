@@ -19,9 +19,6 @@ const order = reactive({
 })
 const currentOrderStatus = ref('訂單處理中')
 const paymentObj = ref({})
-const isShowPayment = ref(false)
-// //判斷是否為創建訂單的頁面 （只有為創建訂單頁面，submitPayment【pay-mode】提交支付方式api才能執行）
-// const isCreateOrder = ref(false)
 const receiver = ref({
     name: '',
     email: '',
@@ -76,7 +73,6 @@ const checkPaymentWay = (paymentMethod) => {
     switch (paymentMethod) {
         case 'ReceivedPay':
             return false
-            break
         case 'CreditCard':
             return true
         case 'ATMTransfer':
@@ -92,7 +88,6 @@ const submitPayment = () => {
     form.method = 'POST'
     form.action = paymentObj.value.furl
     form.style.display = 'none'
-
     // 添加所有表單字段
     Object.entries(paymentObj.value.data_list).forEach(([key, value]) => {
         const input = document.createElement('input')
@@ -101,7 +96,6 @@ const submitPayment = () => {
         input.value = value
         form.appendChild(input)
     })
-
     // 添加到頁面並提交
     document.body.appendChild(form)
     form.submit()
@@ -131,12 +125,12 @@ onMounted(async () => {
 
 </script>
 <template>
-    <div class="bg-white py-10 md:px-20 px-5 w-full">
+    <div class="bg-white py-10 md:px-20 px-5 w-full overflow-x-visible">
         <!-- 進度條 -->
         <ProgressBar :steps />
         <!-- 購物車 -->
         <CartSummary :cartItems :shippingFee :totalPrice />
-        <div class="w-full flex flex-col border py-10 px-3 mt-10  justify-center ">
+        <div class="w-full flex flex-col border py-10 px-3 mt-10  justify-center overflow-hidden break-words">
             <div class="flex flex-col items-center justify-center ">
                 <!-- 成功提示 -->
                 <div class="pb-10 flex items-center justify-center gap-6">
@@ -155,16 +149,16 @@ onMounted(async () => {
                         </div>
                     </div>
                 </div>
-                <div v-if="checkPaymentWay(paymentObj.mode)"
+                <div v-if="checkPaymentWay(paymentObj.mode)" @click="submitPayment"
                     class="bg-green-600 flex items-center 
                       p-3 md:px-10 rounded-md text-white cursor-pointer hover:bg-green-700 transition-colors duration-300">
-                       <!-- 支付圖標 SVG -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                        </svg>
-                    <button @click="submitPayment">
+                    <!-- 支付圖標 SVG -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                    <button>
                         前往支付
                     </button>
                 </div>
@@ -186,19 +180,19 @@ onMounted(async () => {
                             </div>
                         </div>
                         <!-- 送貨資訊 -->
-                        <div >
+                        <div>
                             <h3 class="font-bold text-xl border-b pb-1 mb-2">送貨資訊</h3>
                             <div class="grid grid-cols-[100px_1fr] gap-y-1 text-gray-600">
-                                <span >收件人名稱:</span>
+                                <span>收件人名稱:</span>
                                 <span>{{ receiver.name }}</span>
-                                <span >收件人電話:</span>
+                                <span>收件人電話:</span>
                                 <span>{{ receiver.phone }}</span>
 
-                                <span >出貨狀態:</span>
+                                <span>出貨狀態:</span>
                                 <span>{{ currentOrderStatus }}</span>
-                                <span >送貨方式簡介:</span>
-                                <span >下單後3個工作天內出貨，出貨後5-14個工作天內到貨</span>
-                                <span >收件地址:</span>
+                                <span>送貨方式簡介:</span>
+                                <span>下單後3個工作天內出貨，出貨後5-14個工作天內到貨</span>
+                                <span>收件地址:</span>
                                 <span class="">{{ receiver.address }}</span>
                             </div>
                         </div>

@@ -43,7 +43,7 @@ onMounted(async () => {
              <div class="text-white w-[20%] mb-4" > 
                 <Select :selects="sortSeleteds" @update:selected="handleSort" />
             </div>
-            <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <ul class="grid grid-cols-2 lg:grid-cols-4 gap-6">
                 <li v-for="product in products" :key="product.oig_id"
                     class="bg-[#1d1a1a] cursor-pointer rounded-lg overflow-hidden ">
                     <NuxtLink :to="`/products/${product.oig_id}`">
@@ -51,7 +51,7 @@ onMounted(async () => {
                             <img :src="product.images" :alt="product.group_name" class="w-full h-full object-cover">
                         </div>
                         <div class="p-4 text-center">
-                            <h3 class="text-lg text-white font-bold mb-2">{{ product.group_name }}</h3>
+                            <h3 class="text-lg text-white font-bold mb-2 truncate">{{ product.group_name }}</h3>
                             <p class="text-[#ac886b] font-bold mb-1">HK ${{ product.price_min }}</p>
                             <p class="text-gray-500 line-through">HK ${{ product.price_original_max }}</p>
                         </div>

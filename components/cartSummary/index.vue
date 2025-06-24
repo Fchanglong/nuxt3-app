@@ -133,7 +133,7 @@ const toggleCart = () => {
                 </div>
             </div>
             <!-- 統計 -->
-            <div class="md:w-[730px] ml-auto mr-10  p-3 ">
+            <div class="md:w-[730px] ml-auto md:mr-10 md:p-3  px-3 ">
                 <div class="flex justify-between">
                     <span>小計:</span>
                     <span>NT${{ subtotal }}</span>

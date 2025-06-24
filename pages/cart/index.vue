@@ -107,7 +107,7 @@ const updateSelectsDeliver = (option) => {
     if (process.client) {
         sessionStorage.setItem('logistics', JSON.stringify(option))
     }
-    address.value=''
+    address.value = ''
 }
 
 const updateSelectsPay = (option) => {
@@ -202,7 +202,7 @@ const handleMapCallback = () => {
 }
 // 恢復門店信息的函數
 const getSelectedStore = () => {
-    if(selectedDeliver.value.name !== '速達快速到店') return
+    if (selectedDeliver.value.name !== '速達快速到店') return
     if (process.client) {
         const savedStore = sessionStorage.getItem('addressData')
         if (savedStore) {
@@ -248,7 +248,7 @@ onMounted(async () => {
 </script>
 
 <template>
-         <div v-if="cartItems.length > 0" class="bg-white py-10 md:px-20 px-5">
+    <div v-if="cartItems.length > 0" class="bg-white py-10 md:px-20 px-5">
         <!-- 進度條 -->
         <ProgressBar :steps />
         <!-- 購物車表格 -->
@@ -266,11 +266,14 @@ onMounted(async () => {
                 <!-- 内容 -->
                 <div v-for="item in cartItems" :key="item.id"
                     class=" md:grid grid-cols-7 items-center text-center border-t py-3">
-                    <div class="col-span-2 flex items-center gap-4 pl-4">
+                    <div class="md:col-span-2 flex items-center  gap-4 pl-4">
                         <img :src="item.display_img_small" alt="" class="w-16 h-16 object-cover" />
                         <div class="text-left">
                             <div class="">{{ item.form_name }}</div>
                         </div>
+                        <!-- 移動端刪除按鈕 -->
+                        <button @click="removeItem(item.item_id)"
+                            class="md:hidden ml-auto mr-3 mb-6 text-2xl font-bold text-gray-500 hover:text-red-600">&times;</button>
                     </div>
                     <div class="hidden md:flex flex-col text-sm text-gray-500">
                         <span v-for="(spec, index) in item.sub" :key="index" :class="{
@@ -279,24 +282,42 @@ onMounted(async () => {
                             {{ spec.sub_type === 'SFREE' ? '贈品:' : '' }}{{ spec.form_name }}&times;{{ spec.num }}
                         </span>
                     </div>
-                    <div>
-                        <div class="font-bold">NT${{ item.price }}</div>
-                        <!-- <div class="text-gray-400 line-through text-sm">NT${{ item.originalPrice }}</div> -->
+                    <div class="hidden md:block">
+                        <span class="md:hidden">單價：</span>
+                        <span class="font-bold">NT${{ item.price }}</span>
                     </div>
-                    <div>
+                    <div class="hidden md:block">
                         <div class="inline-flex items-center border rounded box-border">
                             <button @click="changeQuantity(item, 'reduce')" class="px-2 w-8 border ">-</button>
                             <span class="px-3">{{ item.num }}</span>
                             <button @click="changeQuantity(item, 'add')" class="px-2 w-8 border">+</button>
                         </div>
                     </div>
-                    <div class="flex items-center justify-center gap-2">
+                    <div class="hidden md:flex items-center justify-center gap-2">
+                        <span class="md:hidden">小計：</span>
                         <span class="font-bold">NT${{ item.total }}</span>
-
                     </div>
                     <div>
                         <button @click="removeItem(item.item_id)"
-                            class="text-2xl font-bold text-gray-500 hover:text-red-600">&times;</button>
+                            class="hidden md:block text-2xl font-bold text-gray-500 hover:text-red-600">&times;</button>
+                    </div>
+                    <!-- 移動端購物車商品信息 -->
+                    <div class="md:hidden max-w-full flex justify-between items-center  m-3 overflow-hidden">
+                        <div class="flex items-center justify-start border rounded box-border">
+                            <button @click="changeQuantity(item, 'reduce')" class="px-4 py-2 w-10 border ">-</button>
+                            <span class="px-8 py-2">{{ item.num }}</span>
+                            <button @click="changeQuantity(item, 'add')" class="px-4 py-2 w-10 border">+</button>
+                        </div>
+                         <div class="text-sm ">
+                            <div>
+                                <span class="md:hidden">單價：</span>
+                                <span class="font-bold">NT${{ item.price }}</span>
+                            </div>
+                            <div class="">
+                                <span class="md:hidden">小計：</span>
+                                <span class="font-bold">NT${{ item.total }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -310,7 +331,7 @@ onMounted(async () => {
                 <div class="flex flex-col gap-3 p-3">
                     <div>
                         <span>送貨方式</span>
-                        <Select :isOrder="true" :selects="selectsDeliver"  :initialValue="selectedDeliver"
+                        <Select :isOrder="true" :selects="selectsDeliver" :initialValue="selectedDeliver"
                             @update:selected="updateSelectsDeliver" />
                         <span class="text-gray-500 text-sm">下單後3個工作天內出貨，出貨後5-14個工作天內到貨</span>
                     </div>
@@ -319,7 +340,7 @@ onMounted(async () => {
                         <input v-if="selectedDeliver.name !== '速達快速到店'" type="text" v-model="address" placeholder="收件地址"
                             @input="clearAddressError" :class="{ 'border-red-500 ': formErrors.address }"
                             class="border border-gray-300 rounded px-3 py-1 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
-                        <!-- ✅ 新增：地圖選址按鈕 -->
+                        <!-- 地圖選址按鈕 -->
                         <div class="flex gap-5" v-else>
                             <form name="shop" method="post" :action="mapService.postUrl">
                                 <input name="ReturnUrl" type="hidden" v-model="mapService.ReturnUrl">
@@ -331,7 +352,7 @@ onMounted(async () => {
                             </form>
                             <input type="text" v-model="address" disabled
                                 class="border border-gray-300 rounded px-3 py-1 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
-                            <!-- ✅ 新增：地圖選址按鈕 -->
+                            <!-- 地圖選址按鈕 -->
                         </div>
                         <div class="h-5 mt-1">
                             <span v-if="formErrors.address" class="text-red-500 text-sm">{{ alertText }}</span>
@@ -353,7 +374,7 @@ onMounted(async () => {
                     <div class="space-y-2">
                         <div class="flex justify-between">
                             <span>小計:</span>
-                            <span>${{ subtotal }}</span>
+                            <span class="font-bold">${{ subtotal }}</span>
                         </div>
                         <div class="flex justify-between">
                             <span>運費:</span>

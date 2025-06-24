@@ -6,6 +6,7 @@ const router = useRouter()
 const cartItems = computed(() => store.getters['cart/getItems'] || [])
 const shippingFee = computed(() => store.getters['cart/getShipping'] || 0)
 const totalPrice = computed(() => store.getters['cart/getTotal'] || 0)
+const isLoading = ref(false)
 const alertText = '內容不能為空'
 const formInfo = reactive({
     name: '',
@@ -71,6 +72,7 @@ const getCurrentInvoiceType = (option) => {
 }
 const submitOrder = async () => {
     if (!validateForm()) return
+    isLoading.value = true
     await store.dispatch('order/createOrder', {
         name: formInfo.name,
         phone: formInfo.phone,
@@ -86,6 +88,7 @@ const submitOrder = async () => {
     })
     const { o } = store.getters['order/getOrderInfo']
     await store.dispatch('order/submitPayMode')
+    isLoading.value = false
     if (o) {
         // 確保有訂單號才跳轉
         router.push(`/order/${o}`)
@@ -167,9 +170,10 @@ onMounted(() => {
                 <div class="flex-1">
                     <!-- 送貨資料 -->
                     <div class=" w-full flex flex-col border mt-10  justify-center">
-                        <div class="border w-full text-xl p-4 bg-gray-100 border-b flex justify-between">
+                        <div class="border w-full text-xl p-4 bg-gray-100 border-b flex items-center justify-between">
                             <span class="">送貨資料</span>
-                            <span class="">運費: {{ shippingFee === '0' ? '免運費' : `NT$${shippingFee}(滿$1000元免運費)`
+                            <span class="text-sm md:text-xl">運費: {{ shippingFee === '0' ? '免運費' :
+                                `NT$${shippingFee}(滿$1000元免運費)`
                                 }}</span>
                         </div>
                         <div class="flex flex-col gap-3 px-3">
@@ -183,7 +187,7 @@ onMounted(() => {
                                 <span class="text-green-500 text-sm">*務必正確輸入購買人姓名確保正確送達</span>
                                 <div class="h-5 ">
                                     <span v-if="formErrors.name" class="text-red-500 text-sm">{{ alertText
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
                         </div>
@@ -195,7 +199,7 @@ onMounted(() => {
                                     class="border border-gray-300 rounded px-3 py-1 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
                                 <div class="h-5 mt-1">
                                     <span v-if="formErrors.phone" class="text-red-500 text-sm">{{ alertText
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
                         </div>
@@ -208,7 +212,7 @@ onMounted(() => {
                                     class="border border-gray-300 rounded px-3 placeholder:text-sm py-1 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
                                 <div class="h-5 mt-1">
                                     <span v-if="formErrors.address" class="text-red-500 text-sm">{{ alertText
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
                         </div>
@@ -263,7 +267,7 @@ onMounted(() => {
                                         class="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:border-gray-900 transition-colors duration-200 ease-in" />
                                     <div class="h-5 ">
                                         <span v-if="formErrors.email" class="text-red-500 text-sm">{{ alertText
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -273,11 +277,23 @@ onMounted(() => {
                 </div>
             </div>
             <div class="w-full border flex py-10 px-5">
-                <NuxtLink to="/cart" class="text-blue-400 flex-1 flex items-center ">
+                <NuxtLink to="/cart" class="text-blue-400 flex-1 flex items-center w-fit">
                     < 返回購物車 </NuxtLink>
                         <div @click="submitOrder"
-                            class="bg-[#ac886b] cursor-pointer text-center flex-1 py-2 text-white rounded-sm w-full">
-                            提交訂單
+                            class="bg-[#ac886b] cursor-pointer text-center flex-1 py-2 text-white rounded-sm w-full h-[40px]">
+                            <div class=" w-full flex justify-center" v-if="isLoading">
+                                <svg class="animate-spin h-6 w-6 " xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4">
+                                    </circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <span v-else>提交訂單</span>
+
                         </div>
             </div>
 

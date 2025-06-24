@@ -11,7 +11,13 @@ onMounted(() => {
     setupStatePersistence()
   }
 })
+useHead({
+  title: '電商網站',
+  meta: [
+    { name: 'description', content: '非常好的電商網站' }
+  ],
 
+})
 </script>
 <template>
   <div>
