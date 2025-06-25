@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   },
   compatibilityDate: "2025-05-15",
   css: ["~/assets/css/index.css"],
-  // // 添加开发服务器代理配置
+  //  添加开发服务器代理配置
   vite: {
     server: {
       proxy: {

@@ -1,4 +1,6 @@
 <script setup>
+import { useStore } from 'vuex'
+const store = useStore()
 const bannerImgUrl = 'https://shoplineimg.com/62146b2be0f4410023ad65f9/657850071bc897000e9cf6a9/2160x.webp?source_format=jpg'
 const topInfo = {
   title: '經營理念',
@@ -42,8 +44,21 @@ const infoArr = [
     description: '品牌名來自英文 massage 的詞源 massa，始於創辦人在觀察到家中長輩長期臥床的困擾後，決定開發一款人人都能負擔、輕便易用且能高度客製化的按摩器材，讓您盡可能在任何時候、任何地方都能有效放鬆、恢復精力，與家人一起享受溫馨時光!',
   },
 ]
+const { data: seoData } = await useAsyncData('about-seo', async () => {
+  console.log(process.client? '客戶端執行' : '服務端執行', );
+  return store.getters['website/getWebsiteSeo']
+})
+
+useHead({
+  title: seoData.value.about_title,
+  meta: [
+    {
+      name: 'description',
+      content: seoData.value.about_description
+    }
+  ]
+})
 </script>
-<!-- pages/about.vue -->
 <template>
   <div class=" overflow-x-hidden flex flex-col items-center justify-center gap-5 px-4 md:px-0 ">
     <div class="w-full">
@@ -70,7 +85,8 @@ const infoArr = [
       <span class="block text-2xl font-bold">{{ bottomInfo.title }}</span>
       <span class="block text-lg text-gray-500">{{ bottomInfo.subtitle }}</span>
       <p class="w-[80%] ">{{ bottomInfo.content }}</p>
-      <button class="px-10 py-2 rounded bg-[#ac886b] text-white hover:bg-white hover:text-[#1d1a1a] transition whitespace-nowrap min-w-[8rem] max-w-full w-fit">
+      <button
+        class="px-10 py-2 rounded bg-[#ac886b] text-white hover:bg-white hover:text-[#1d1a1a] transition whitespace-nowrap min-w-[8rem] max-w-full w-fit">
         點我看商品頁
       </button>
     </div>

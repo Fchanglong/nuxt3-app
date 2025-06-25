@@ -31,6 +31,19 @@ const getOrderNumByPhone = async () => {
     }
 
 }
+const { data: seoData } = await useAsyncData('about-seo', async () => {
+  return store.getters['website/getWebsiteSeo']
+})
+
+useHead({
+  title: seoData.value.check_title,
+  meta: [
+    {
+      name: 'description',
+      content: seoData.value.check_description
+    }
+  ],
+})
 </script>
 <template>
     <div class="w-full bg-white flex flex-col items-center p-20 gap-10">

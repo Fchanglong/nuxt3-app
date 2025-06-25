@@ -5,7 +5,8 @@ const currentCategoryId = ref(null)
 const menu = ref([])
 const products = ref([])
 const pending = ref(true)
-
+import { useStore } from 'vuex'
+const store = useStore()
 // 切换分类函数
 const getCateCommodities = (cateId) => {
     currentCategoryId.value = cateId
@@ -17,6 +18,7 @@ const sortSeleteds = ref([
     { id: 4, name: '價格:由低到高', value: 'lowToHigh' },
     { id: 5, name: '價格:由高到低', value: 'highToLow' }
 ])
+
 
 const handleSort = (value) => {
     switch (value.value) {
@@ -74,7 +76,7 @@ onMounted(() => {
                     </span>
                 </div>
             </div>
-            <div class="text-white w-[20%] mb-4" > 
+            <div class="text-white w-[20%] mb-4">
                 <Select :selects="sortSeleteds" @update:selected="handleSort" />
             </div>
             <!-- 添加商品加载状态 -->

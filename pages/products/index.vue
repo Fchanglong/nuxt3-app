@@ -1,5 +1,7 @@
 <script setup>
 import { getAllCommoditiesApi } from '~/api/commodify-api'
+import { useStore } from 'vuex'
+const store = useStore()
 const products = ref([])
 const sortSeleteds = ref([
     { id: 1, name: '商品排序', value: '' },
@@ -31,6 +33,19 @@ const handleSort = (value) => {
 onMounted(async () => {
     const res = await getAllCommoditiesApi()
     products.value = res.data || []
+})
+const { data: seoData } = await useAsyncData('about-seo', async () => {
+  return store.getters['website/getWebsiteSeo']
+})
+
+useHead({
+  title: seoData.value.commodity_title,
+  meta: [
+    {
+      name: 'description',
+      content: seoData.value.commodity_description
+    }
+  ],
 })
 </script>
 

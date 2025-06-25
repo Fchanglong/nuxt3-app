@@ -1,20 +1,43 @@
-   const state = () => ({
-        // 網站模塊狀態
-    })
-   const mutations = {
-        // 網站模塊變更
+import { getWebstiteApi } from "@/api/website-api.js";
+const state = () => ({
+  website: {},
+});
+
+const mutations = {
+  SET_WEBSITE_DATA(state, payload) {
+    state.website = payload;
+  },
+};
+
+const actions = {
+  async fetchWebsiteData({ commit }) {
+    try {
+      const response = await getWebstiteApi();
+      // 使用 reduce 將數據轉換為對象形式
+      const formattedData = response.data.data.reduce((acc, item) => {
+        acc[item.type] = item.data || {}; // 使用 type 作為鍵，data 作為值
+        return acc;
+      }, {});
+      commit("SET_WEBSITE_DATA", formattedData);
+    } catch (error) {
+      console.error("獲取網站數據失敗:", error);
     }
-    const actions = {
-        // 網站模塊行為
-    }
-    const getters = {
-        // 網站模塊獲取器
-    }
+  },
+};
+
+const getters = {
+  getWebsiteSeo: (state) => {
+    return state.website?.seo || {};
+  },
+  getWebsiteData: (state) => {
+    return state.website;
+  },
+};
 
 export default {
   namespaced: true,
   state,
   getters,
   mutations,
-  actions
-}
+  actions,
+};
