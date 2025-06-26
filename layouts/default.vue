@@ -5,46 +5,48 @@ import { restoreState, setupStatePersistence } from '~/store/index'
 
 const store = useStore()
 
-// 只在客户端执行
-if (process.client) {
-  restoreState()
-  setupStatePersistence()
-}
+
 const { data: seoData } = await useAsyncData('website-seo', async () => {
   await store.dispatch('website/fetchWebsiteData');
-  return store.getters['website/getWebsiteSeo'] 
+  return store.getters['website/getWebsiteSeo']
 });
-onMounted(async ()=>{
+
+onMounted(async () => {
+  if (process.client) {
+    restoreState()
+    setupStatePersistence()
+  }
+  //客戶端的website数据
   await store.dispatch('website/fetchWebsiteData');
-  
 })
+
 // 使用响应式的 useHead
 useHead({
-  title: '電商網站',
+  title:seoData.value.og_title,
   meta: [
     {
       name: 'description',
-      content:  seoData.value.meta_description
+      content: seoData.value.meta_description
     },
     {
       name: 'keywords',
-      content: seoData.value.meta_keywords 
+      content: seoData.value.meta_keywords
     },
-     {
+    {
       property: 'og:description',
-      content: seoData.value.og_description 
+      content: seoData.value.og_description
     },
     {
       property: 'og:title',
-      content: seoData.value.og_title 
+      content: seoData.value.og_title
     },
     {
       property: 'og:image',
-      content: seoData.value.og_image 
+      content: seoData.value.og_image
     },
     {
       property: 'og:url',
-      content: seoData.value.og_url 
+      content: seoData.value.og_url
     }
   ],
 })

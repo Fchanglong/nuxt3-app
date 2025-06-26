@@ -92,8 +92,8 @@ onMounted(() => {
                         </div>
                         <div class="p-4 text-center">
                             <h3 class="text-lg text-white font-bold mb-2 truncate">{{ product.group_name }}</h3>
-                            <p class="text-[#ac886b] font-bold mb-1">HK ${{ product.price_min }}</p>
-                            <p class="text-gray-500 line-through">HK ${{ product.price_original_max }}</p>
+                            <p class="text-[#ac886b] font-bold mb-1">${{ Number(product.price_min).toLocaleString() }}</p>
+                            <p class="text-gray-500 line-through">${{ Number(product.price_original_max).toLocaleString() }}</p>
                         </div>
                     </NuxtLink>
                 </li>

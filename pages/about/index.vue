@@ -44,8 +44,8 @@ const infoArr = [
     description: '品牌名來自英文 massage 的詞源 massa，始於創辦人在觀察到家中長輩長期臥床的困擾後，決定開發一款人人都能負擔、輕便易用且能高度客製化的按摩器材，讓您盡可能在任何時候、任何地方都能有效放鬆、恢復精力，與家人一起享受溫馨時光!',
   },
 ]
+
 const { data: seoData } = await useAsyncData('about-seo', async () => {
-  console.log(process.client? '客戶端執行' : '服務端執行', );
   return store.getters['website/getWebsiteSeo']
 })
 

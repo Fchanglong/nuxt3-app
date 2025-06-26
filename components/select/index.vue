@@ -11,7 +11,7 @@ const props = defineProps({
     },
     initialValue: {
         type: Object,
-        default: () => (null)
+        default: () => ({})
     }
 
 })
@@ -23,12 +23,12 @@ const selectedOption = ref({})
 watch(() => props.selects, (newSelects) => {
     if (newSelects && newSelects.length > 0) {
         // 如果有 initialValue，優先使用 initialValue
-        if (props.initialValue) {
+        if (Object.keys(props.initialValue).length > 0) {
             selectedOption.value = props.initialValue
             // 不要觸發 emit，因為這是初始化，不是用戶選擇
             return
         }
-        
+
         // 只有在沒有選中項且沒有 initialValue 時才設置默認值
         if (Object.keys(selectedOption.value).length === 0) {
             selectedOption.value = newSelects[0]

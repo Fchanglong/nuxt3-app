@@ -31,7 +31,7 @@ const getOrderNumByPhone = async () => {
     }
 
 }
-const { data: seoData } = await useAsyncData('about-seo', async () => {
+const { data: seoData } = await useAsyncData('check_order-seo', async () => {
   return store.getters['website/getWebsiteSeo']
 })
 
