@@ -22,15 +22,12 @@
         <!-- <NuxtLink to="/cart" class="cart-link">
           🛒<span class="cart-count">{{ cartCount }}</span>
         </NuxtLink> -->
-          <button  class="cart-link " @click.stop="toggleCartModal">
-            🛒<span class="cart-count">
+        <button class="cart-link " @click.stop="toggleCartModal">
+          🛒<span class="cart-count">
             <ClientOnly>{{ cartCount }}</ClientOnly>
-            </span>
-          </button>
-        <button
-          class="main-nav__toggle"
-          @click="mobileMenuOpen = !mobileMenuOpen"
-        >
+          </span>
+        </button>
+        <button class="main-nav__toggle" @click="mobileMenuOpen = !mobileMenuOpen">
           <span v-if="!mobileMenuOpen">&#9776;</span>
           <span v-else>&times;</span>
         </button>
@@ -41,13 +38,11 @@
       <nav class="main-nav__links" v-if="isDesktop">
         <NuxtLink to="/" exact class="main-nav__link">首頁</NuxtLink>
         <NuxtLink to="/about" class="main-nav__link">關於masa</NuxtLink>
-        <NuxtLink to="/products/categories" class="main-nav__link"
-          >精選商品</NuxtLink
-        >
+        <NuxtLink to="/products/categories" class="main-nav__link">精選商品</NuxtLink>
         <NuxtLink to="/testimonials" class="main-nav__link">客戶心得</NuxtLink>
 
         <!-- “競品比較” 下拉 -->
-        <div class="dropdown" ref="cmpWrapper">
+        <!-- <div class="dropdown" ref="cmpWrapper">
           <button
             @click="compareMenuOpen = !compareMenuOpen"
             class="dropdown__button"
@@ -72,41 +67,59 @@
               </NuxtLink>
             </li>
           </ul>
+        </div> -->
+        <!-- 動態渲染 "競品比較" 下拉 - 只有當 isShow 為 true 時才顯示 -->
+        <div v-if="compare.isShow" class="dropdown" ref="cmpWrapper">
+          <button @click="compareMenuOpen = !compareMenuOpen" class="dropdown__button">
+            {{ compare.title }}
+            <span class="arrow"></span>
+          </button>
+          <ul v-show="compareMenuOpen" class="dropdown__menu">
+            <li v-for="item in compare.items">
+              <NuxtLink :to="item.url" class="dropdown__item-link">
+                {{ item.title }}
+              </NuxtLink>
+            </li>
+          </ul>
         </div>
-
         <NuxtLink to="/posts" class="main-nav__link">部落格首頁</NuxtLink>
 
         <!-- “常見問答” 下拉 -->
-        <div class="dropdown" ref="faqWrapper">
+        <!-- <div class="dropdown" ref="faqWrapper">
           <button @click="faqMenuOpen = !faqMenuOpen" class="dropdown__button">
             常見問答
             <span class="arrow"></span>
           </button>
           <ul v-show="faqMenuOpen" class="dropdown__menu">
             <li>
-              <NuxtLink to="/faq/general" class="dropdown__item-link"
-                >常見問答</NuxtLink
-              >
+              <NuxtLink to="/faq/general" class="dropdown__item-link">常見問答</NuxtLink>
             </li>
             <li>
-              <NuxtLink to="/faq/manual" class="dropdown__item-link"
-                >產品操作說明</NuxtLink
-              >
+              <NuxtLink to="/faq/manual" class="dropdown__item-link">產品操作說明</NuxtLink>
             </li>
             <li>
-              <NuxtLink to="/faq/warranty" class="dropdown__item-link"
-                >保固註冊</NuxtLink
-              >
+              <NuxtLink to="/faq/warranty" class="dropdown__item-link">保固註冊</NuxtLink>
             </li>
             <li>
-              <NuxtLink to="/faq/shipping" class="dropdown__item-link"
-                >運送政策</NuxtLink
-              >
+              <NuxtLink to="/faq/shipping" class="dropdown__item-link">運送政策</NuxtLink>
             </li>
             <li>
-              <NuxtLink to="/faq/return" class="dropdown__item-link"
-                >30天試用與退換貨</NuxtLink
-              >
+              <NuxtLink to="/faq/return" class="dropdown__item-link">30天試用與退換貨</NuxtLink>
+            </li>
+          </ul>
+        </div> -->
+
+        <!-- 動態渲染 "常見問答" 下拉 -->
+        <div v-if="faq.isShow" class="dropdown" ref="faqWrapper">
+          <button @click="faqMenuOpen = !faqMenuOpen" class="dropdown__button">
+            {{ faq.title }}
+            <span class="arrow"></span>
+          </button>
+          <ul v-show="faqMenuOpen" class="dropdown__menu">
+            <li v-for="item in faq.items" :key="item.id">
+              <NuxtLink :to="item.url" class="dropdown__item-link">
+                {{ item.title }}
+              </NuxtLink>
             </li>
           </ul>
         </div>
@@ -116,7 +129,7 @@
           <!-- <NuxtLink to="/cart" class="cart-link">
             🛒<span class="cart-count">{{ cartCount }}</span>
           </NuxtLink> -->
-            <button  class="cart-link " @click.stop="toggleCartModal">
+          <button class="cart-link " @click.stop="toggleCartModal">
             🛒<span class="cart-count">
               <ClientOnly>{{ cartCount }}</ClientOnly>
             </span>
@@ -128,125 +141,94 @@
     <!-- ========================================================= -->
     <!-- 移动端遮罩层 + 左侧滑出抽屉菜单                           -->
     <!-- ========================================================= -->
-    <div
-      class="mobile-overlay"
-      v-show="mobileMenuOpen"
-      @click="mobileMenuOpen = false"
-    ></div>
+    <div class="mobile-overlay" v-show="mobileMenuOpen" @click="mobileMenuOpen = false"></div>
 
     <!-- 注意：这里改用 v-show 而非 v-if，让 transition 能正常触发 -->
     <transition name="slide">
       <div class="mobile-menu" v-show="mobileMenuOpen">
         <nav class="mobile-menu__links">
-          <NuxtLink to="/" exact class="mobile-menu__link" @click="closeAll"
-            >首頁</NuxtLink
-          >
-          <NuxtLink to="/about" class="mobile-menu__link" @click="closeAll"
-            >關於masa</NuxtLink
-          >
-          <NuxtLink
-            to="/products/categories"
-            class="mobile-menu__link"
-            @click="closeAll"
-            >精選商品</NuxtLink
-          >
-          <NuxtLink
-            to="/testimonials"
-            class="mobile-menu__link"
-            @click="closeAll"
-            >客戶心得</NuxtLink
-          >
+          <NuxtLink to="/" exact class="mobile-menu__link" @click="closeAll">首頁</NuxtLink>
+          <NuxtLink to="/about" class="mobile-menu__link" @click="closeAll">關於masa</NuxtLink>
+          <NuxtLink to="/products/categories" class="mobile-menu__link" @click="closeAll">精選商品</NuxtLink>
+          <NuxtLink to="/testimonials" class="mobile-menu__link" @click="closeAll">客戶心得</NuxtLink>
 
           <!-- 移动端 “競品比較” 折叠菜单 -->
-        
-          <button
+          <!-- <button
             class="mobile-menu__link"
             @click="mobileCompareOpen = !mobileCompareOpen"
           >
             競品比較
             <span class="arrow" :class="{ rotated: mobileCompareOpen }"></span>
-          </button>
-          <ul v-show="mobileCompareOpen" class="mobile-menu__sublist">
-            <li>
-              <NuxtLink
-                to="/compare/massage-chair"
-                class="mobile-menu__sublink"
-                @click="closeAll"
-                >masa vs 按摩椅</NuxtLink
-              >
-            </li>
-            <li>
-              <NuxtLink
-                to="/compare/fascia-gun"
-                class="mobile-menu__sublink"
-                @click="closeAll"
-                >masa vs 筋膜槍</NuxtLink
-              >
-            </li>
-            <li>
-              <NuxtLink
-                to="/compare/other-pads"
-                class="mobile-menu__sublink"
-                @click="closeAll"
-                >masa vs 其他按摩椅墊</NuxtLink
-              >
-            </li>
-          </ul>
+          </button> -->
+        
+          <!-- 移動端動態渲染 "競品比較" 折疊菜單 -->
+          <template v-if="compare.isShow">
+            <button class="mobile-menu__link" @click="mobileCompareOpen = !mobileCompareOpen">
+              {{ compare.title }}
+              <span class="arrow" :class="{ rotated: mobileCompareOpen }"></span>
+            </button>
+            <ul v-show="mobileCompareOpen" class="mobile-menu__sublist">
+              <li v-for="item in compare.items" :key="item.id">
+                <NuxtLink :to="item.url" class="mobile-menu__sublink" @click="closeAll">
+                  {{ item.title }}
+                </NuxtLink>
+              </li>
+            </ul>
+          </template>
 
-          <NuxtLink to="/posts" class="mobile-menu__link" @click="closeAll"
-            >部落格首頁</NuxtLink
-          >
+          <!-- <ul v-show="mobileCompareOpen" class="mobile-menu__sublist">
+            <li>
+              <NuxtLink to="/compare/massage-chair" class="mobile-menu__sublink" @click="closeAll">masa vs 按摩椅
+              </NuxtLink>
+            </li>
+            <li>
+              <NuxtLink to="/compare/fascia-gun" class="mobile-menu__sublink" @click="closeAll">masa vs 筋膜槍</NuxtLink>
+            </li>
+            <li>
+              <NuxtLink to="/compare/other-pads" class="mobile-menu__sublink" @click="closeAll">masa vs 其他按摩椅墊
+              </NuxtLink>
+            </li>
+          </ul> -->
+
+          <NuxtLink to="/posts" class="mobile-menu__link" @click="closeAll">部落格首頁</NuxtLink>
 
           <!-- 移动端 “常見問答” 折叠菜单 -->
-          <button
-            class="mobile-menu__link"
-            @click="mobileFaqOpen = !mobileFaqOpen"
-          >
+          <!-- <button class="mobile-menu__link" @click="mobileFaqOpen = !mobileFaqOpen">
             常見問答
             <span class="arrow" :class="{ rotated: mobileFaqOpen }"></span>
           </button>
           <ul v-show="mobileFaqOpen" class="mobile-menu__sublist">
             <li>
-              <NuxtLink
-                to="/faq/general"
-                class="mobile-menu__sublink"
-                @click="closeAll"
-                >常見問答</NuxtLink
-              >
+              <NuxtLink to="/faq/general" class="mobile-menu__sublink" @click="closeAll">常見問答</NuxtLink>
             </li>
             <li>
-              <NuxtLink
-                to="/faq/manual"
-                class="mobile-menu__sublink"
-                @click="closeAll"
-                >產品操作說明</NuxtLink
-              >
+              <NuxtLink to="/faq/manual" class="mobile-menu__sublink" @click="closeAll">產品操作說明</NuxtLink>
             </li>
             <li>
-              <NuxtLink
-                to="/faq/warranty"
-                class="mobile-menu__sublink"
-                @click="closeAll"
-                >保固註冊</NuxtLink
-              >
+              <NuxtLink to="/faq/warranty" class="mobile-menu__sublink" @click="closeAll">保固註冊</NuxtLink>
             </li>
             <li>
-              <NuxtLink
-                to="/faq/shipping"
-                class="mobile-menu__sublink"
-                @click="closeAll"
-                >運送政策</NuxtLink
-              >
+              <NuxtLink to="/faq/shipping" class="mobile-menu__sublink" @click="closeAll">運送政策</NuxtLink>
             </li>
             <li>
-              <NuxtLink
-                to="/faq/return"
-                class="mobile-menu__sublink"
-                @click="closeAll"
-                >30天試用與退換貨</NuxtLink
-              >
+              <NuxtLink to="/faq/return" class="mobile-menu__sublink" @click="closeAll">30天試用與退換貨</NuxtLink>
             </li>
-          </ul>
+          </ul> -->
+
+          <!-- 移動端動態渲染 "常見問答" -->
+          <template v-if="faq.isShow">
+            <button class="mobile-menu__link" @click="mobileFaqOpen = !mobileFaqOpen">
+              {{ faq.title }}
+              <span class="arrow" :class="{ rotated: mobileFaqOpen }"></span>
+            </button>
+            <ul v-show="mobileFaqOpen" class="mobile-menu__sublist">
+              <li v-for="item in faq.items" :key="item.id">
+                <NuxtLink :to="item.url" class="mobile-menu__sublink" @click="closeAll">
+                  {{ item.title }}
+                </NuxtLink>
+              </li>
+            </ul>
+          </template>
 
           <!-- <NuxtLink
             to="/account/login"
@@ -261,7 +243,7 @@
             >新用戶註冊</NuxtLink
           > -->
           <NuxtLink to="/cart" class="mobile-menu__link" @click="closeAll">
-           <ClientOnly>購物車 ({{ cartCount }})</ClientOnly>
+            <ClientOnly>購物車 ({{ cartCount }})</ClientOnly>
           </NuxtLink>
         </nav>
       </div>
@@ -270,7 +252,6 @@
 </template>
 
 <script setup>
-
 import { useStore } from 'vuex'
 const store = useStore()
 const toggleCartModal = () => store.dispatch('cart/toggleCartModal')
@@ -283,7 +264,7 @@ const checkScreen = () => {
 };
 onMounted(() => {
   checkScreen();
-  window.addEventListener("resize", checkScreen,{ passive: true });
+  window.addEventListener("resize", checkScreen, { passive: true });
 });
 
 // ==============================
@@ -318,7 +299,7 @@ const clickOutside = (elRef, callback) => {
     if (!elRef.value || elRef.value.contains(e.target)) return;
     callback();
   };
-  onMounted(() => window.addEventListener("click", handler,{ passive: true }));
+  onMounted(() => window.addEventListener("click", handler, { passive: true }));
 };
 const langWrapper = ref(null);
 const curWrapper = ref(null);
@@ -353,6 +334,17 @@ const closeAll = () => {
 // 5. 购物车数量示例 (可替换为 Pinia/Store 中的实际值)
 // ==============================
 const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
+
+// 根據後臺顯示header和對應的下拉框
+const { data: getWebsiteData } = useAsyncData('header-data', async () => {
+  return store.getters['website/getWebsiteData']
+})
+const compare = computed(() => {
+  return getWebsiteData.value?.compare || []
+})
+const faq = computed(() => {
+  return getWebsiteData.value?.faq || []
+})
 </script>
 
 <style scoped>
@@ -364,7 +356,8 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
   top: 0;
   left: 0;
   right: 0;
-  background: #191919;     /* 深夜蓝色背景（可根据官网实际稍作微调） */
+  background: #191919;
+  /* 深夜蓝色背景（可根据官网实际稍作微调） */
   z-index: 999;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -373,13 +366,18 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
    顶部选项栏（桌面端 ≥768px 可见）
    =========================== */
 .top-bar {
-  height: 1.5rem;        /* 48px */
+  height: 1.5rem;
+  /* 48px */
   display: flex;
   justify-content: flex-end;
-  padding: 0.25rem 1rem;  /* 大约 4px 16px */
-  background: #191919;    /* 比主导航再深一点 */
-  font-size: 14px;        /* 统一字体大小 */
-  color: #cfd8dc;         /* 浅灰白 (#cfd8dc) */
+  padding: 0.25rem 1rem;
+  /* 大约 4px 16px */
+  background: #191919;
+  /* 比主导航再深一点 */
+  font-size: 14px;
+  /* 统一字体大小 */
+  color: #cfd8dc;
+  /* 浅灰白 (#cfd8dc) */
 }
 
 .top-bar__right {
@@ -388,12 +386,15 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
 }
 
 .top-bar__link {
-  margin-left: 1.5rem;     /* 24px */
-  color: #cfd8dc;          /* 浅灰白 */
+  margin-left: 1.5rem;
+  /* 24px */
+  color: #cfd8dc;
+  /* 浅灰白 */
   text-decoration: none;
   transition: color 0.2s;
   font-size: 14px;
 }
+
 .top-bar__link:hover {
   color: #ffffff;
 }
@@ -405,12 +406,14 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;   /* 大约 12px 16px */
+  padding: 0.75rem 1rem;
+  /* 大约 12px 16px */
 }
 
 /* Logo 区域（始终在左） */
 .main-nav__logo img {
-  height: 2.5rem;         /* 40px */
+  height: 2.5rem;
+  /* 40px */
   object-fit: contain;
 }
 
@@ -421,23 +424,29 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
 .mobile-icons {
   display: flex;
   align-items: center;
-  gap: 1rem;             /* 16px */
+  gap: 1rem;
+  /* 16px */
 }
+
 .cart-link {
   position: relative;
   color: #cfd8dc;
   text-decoration: none;
-  font-size: 1.25rem;    /* 20px */
+  font-size: 1.25rem;
+  /* 20px */
   transition: color 0.2s;
 }
+
 .cart-link:hover {
   color: #ffffff;
 }
+
 .cart-count {
   position: absolute;
   top: -0.4rem;
   right: -0.4rem;
-  background: #e53935;   /* 红色 */
+  background: #e53935;
+  /* 红色 */
   color: #ffffff;
   border-radius: 9999px;
   padding: 0 4px;
@@ -449,11 +458,13 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
 .main-nav__toggle {
   background: none;
   border: none;
-  font-size: 1.5rem;      /* 24px */
+  font-size: 1.5rem;
+  /* 24px */
   color: #cfd8dc;
   cursor: pointer;
   transition: color 0.2s;
 }
+
 .main-nav__toggle:hover {
   color: #ffffff;
 }
@@ -464,22 +475,29 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
 .main-nav__links {
   display: flex;
   align-items: center;
-  justify-content: center;  /* 水平居中 */
-  flex: 1;                  /* 抢占剩余空间 */
-  gap: 1.5rem;              /* 24px 链接间隔 */
+  justify-content: center;
+  /* 水平居中 */
+  flex: 1;
+  /* 抢占剩余空间 */
+  gap: 1.5rem;
+  /* 24px 链接间隔 */
 }
 
 /* 单个导航链接基础样式 */
 .main-nav__link {
   position: relative;
-  color: #cfd8dc;           /* 浅灰白 */
+  color: #cfd8dc;
+  /* 浅灰白 */
   text-decoration: none;
-  padding: 0 4px;           /* 左右 4px 微调 */
+  padding: 0 4px;
+  /* 左右 4px 微调 */
   font-size: 14px;
-  line-height: 1.7;         /* 让文字垂直居中感更好 */
+  line-height: 1.7;
+  /* 让文字垂直居中感更好 */
   font-weight: 500;
   transition: color 0.2s;
 }
+
 .main-nav__link:hover {
   color: #ffffff;
 }
@@ -489,7 +507,7 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
   content: "";
   position: absolute;
   left: 50%;
-  bottom: -2px;            
+  bottom: -2px;
   width: 100%;
   height: 4px;
   background: #ac886b;
@@ -497,6 +515,7 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
   transform-origin: center;
   transition: transform 0.2s ease-out;
 }
+
 .main-nav__link:hover::after {
   transform: translateX(-50%) scaleX(1);
 }
@@ -505,6 +524,7 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
 .main-nav__link.router-link-active {
   color: #ffffff;
 }
+
 .main-nav__link.router-link-active::after {
   /* transform: translateX(-50%) scaleX(1); */
 }
@@ -517,8 +537,10 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
   align-items: center;
   font-size: 1.25rem;
 }
+
 .main-nav__cart .cart-link {
-  margin-left: 1.5rem;     /* 桌面端最右侧留空 24px */
+  margin-left: 1.5rem;
+  /* 桌面端最右侧留空 24px */
 }
 
 /* ===========================
@@ -540,9 +562,11 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
   align-items: center;
   cursor: pointer;
   transition: color 0.2s;
-  padding: 0 4px;           /* 微调左右内边距 */
+  padding: 0 4px;
+  /* 微调左右内边距 */
   line-height: 1.7;
 }
+
 .dropdown__button:hover {
   color: #ffffff;
 }
@@ -560,6 +584,7 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
   transform-origin: center;
   transition: transform 0.2s ease-out;
 }
+
 .dropdown__button:hover::after {
   transform: translateX(-50%) scaleX(1);
 }
@@ -569,14 +594,17 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
   display: inline-block;
   margin-left: 4px;
   border: 5px solid transparent;
-  border-top-color: #cfd8dc; /* 淡灰色 */
+  border-top-color: #cfd8dc;
+  /* 淡灰色 */
   width: 0;
   height: 0;
   transition: transform 0.2s, border-top-color 0.2s;
 }
+
 .dropdown__button:hover .arrow {
   border-top-color: #ffffff;
 }
+
 .arrow.rotated {
   transform: rotate(180deg);
 }
@@ -586,21 +614,27 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
   position: absolute;
   top: 100%;
   margin-top: 4px;
-  background: #191919;         /* 与 .site-header 一致的背景色 */
-  border: 1px solid #191919;   /* 深色边框 */
+  background: #191919;
+  /* 与 .site-header 一致的背景色 */
+  border: 1px solid #191919;
+  /* 深色边框 */
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  min-width: 160px;            /* 160px 最合适，太窄会折行 */
+  min-width: 160px;
+  /* 160px 最合适，太窄会折行 */
   z-index: 1000;
-  padding: 8px 0;              /* 上下内边距 8px */
-  list-style: none;            /* 去掉默认圆点 */
+  padding: 8px 0;
+  /* 上下内边距 8px */
+  list-style: none;
+  /* 去掉默认圆点 */
 }
 
 /* 下拉菜单里的项目：按钮风格 */
 .dropdown__item {
   display: block;
   width: 100%;
-  padding: 8px 12px;           /* 上下 8px，左右 12px */
+  padding: 8px 12px;
+  /* 上下 8px，左右 12px */
   background: none;
   border: none;
   color: #cfd8dc;
@@ -609,8 +643,10 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
+
 .dropdown__item:hover {
-  background: #273742;         /* 更深一点的背景高亮 */
+  background: #273742;
+  /* 更深一点的背景高亮 */
   color: #ffffff;
   border-radius: 4px;
 }
@@ -626,6 +662,7 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
   text-decoration: none;
   transition: background 0.2s, color 0.2s;
 }
+
 .dropdown__item-link:hover {
   background: #273742;
   color: #ffffff;
@@ -664,18 +701,23 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
 .slide-enter-active {
   transition: transform 0.2s ease-out;
 }
+
 .slide-leave-active {
   transition: transform 0.2s ease-in;
 }
+
 .slide-enter-from {
   transform: translateX(-100%);
 }
+
 .slide-enter-to {
   transform: translateX(0);
 }
+
 .slide-leave-from {
   transform: translateX(0);
 }
+
 .slide-leave-to {
   transform: translateX(-100%);
 }
@@ -684,8 +726,10 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
 .mobile-menu__links {
   display: flex;
   flex-direction: column;
-  padding: 1rem;       /* 16px */
-  gap: 0.75rem;        /* 12px 垂直间距 */
+  padding: 1rem;
+  /* 16px */
+  gap: 0.75rem;
+  /* 12px 垂直间距 */
 }
 
 .mobile-menu__link {
@@ -697,10 +741,12 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
   border: none;
   text-align: left;
   width: 100%;
-  padding: 8px 12px;   /* 上下 8px，左右 12px */
+  padding: 8px 12px;
+  /* 上下 8px，左右 12px */
   cursor: pointer;
   transition: color 0.2s, background 0.2s;
 }
+
 .mobile-menu__link:hover {
   background: #273742;
   color: #ffffff;
@@ -708,12 +754,15 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
 }
 
 .mobile-menu__sublink {
-  color: #9fa6ad;       /* 更淡的灰色 */
+  color: #9fa6ad;
+  /* 更淡的灰色 */
   text-decoration: none;
-  padding: 8px 24px;    /* 上下 8px，左右 24px（缩进） */
+  padding: 8px 24px;
+  /* 上下 8px，左右 24px（缩进） */
   font-size: 14px;
   transition: color 0.2s, background 0.2s;
 }
+
 .mobile-menu__sublink:hover {
   background: #273742;
   color: #ffffff;
@@ -724,7 +773,8 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
   display: flex;
   flex-direction: column;
   margin-top: 4px;
-  gap: 4px;             /* 4px 的垂直间距 */
+  gap: 4px;
+  /* 4px 的垂直间距 */
 }
 
 /* ===========================
@@ -735,6 +785,7 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
   .top-bar {
     display: flex;
   }
+
   .main-nav__toggle,
   .mobile-icons,
   .mobile-menu,
@@ -745,14 +796,15 @@ const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
 
 /* 宽度 <768px：隐藏桌面端 (top-bar + main-nav__links + main-nav__cart)，显示移动端 */
 @media (max-width: 767px) {
+
   .top-bar,
   .main-nav__links,
   .main-nav__cart {
     display: none;
   }
+
   .mobile-icons {
     display: flex;
   }
 }
 </style>
-

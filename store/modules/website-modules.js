@@ -14,10 +14,7 @@ const actions = {
     try {
       const response = await getWebstiteApi();
       // 使用 reduce 將數據轉換為對象形式
-      const formattedData = response.data.data.reduce((acc, item) => {
-        acc[item.type] = item.data || {}; // 使用 type 作為鍵，data 作為值
-        return acc;
-      }, {});
+      const formattedData = response.data
       commit("SET_WEBSITE_DATA", formattedData);
     } catch (error) {
       console.error("獲取網站數據失敗:", error);

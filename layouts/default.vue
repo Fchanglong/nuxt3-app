@@ -22,31 +22,31 @@ onMounted(async () => {
 
 // 使用响应式的 useHead
 useHead({
-  title:seoData.value.og_title,
+  title:seoData.value.default.title,
   meta: [
     {
       name: 'description',
-      content: seoData.value.meta_description
+      content: seoData.value.default.description
     },
     {
       name: 'keywords',
-      content: seoData.value.meta_keywords
+      content: seoData.value.default.keywords
     },
     {
       property: 'og:description',
-      content: seoData.value.og_description
+      content: seoData.value.og.og_description
     },
     {
       property: 'og:title',
-      content: seoData.value.og_title
+      content: seoData.value.og.og_title
     },
     {
       property: 'og:image',
-      content: seoData.value.og_image
+      content: seoData.value.og.og_image
     },
     {
       property: 'og:url',
-      content: seoData.value.og_url
+      content: seoData.value.og.og_url
     }
   ],
 })

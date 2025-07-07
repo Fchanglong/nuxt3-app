@@ -94,7 +94,7 @@ onUnmounted(() => {
     >
       <img
         v-for="(image, index) in displayImages"
-        :key="`${image.id}-${index}`"
+        :key="index"
         :src="image.url"
         alt="carousel image"
         class="w-full shrink-0"
