@@ -32,45 +32,45 @@ const bottomCarousel = computed(() => {
     <Carousel :originalImages="topCarousel || []" />
 
     <div class="w-full">
-      <img :src="websiteData.home.img[0]" alt="" class="w-full" />
+      <img :src="websiteData.home?.img[0]" alt="" class="w-full" />
     </div>
 
     <div class="flex flex-col items-center gap-[70px] py-[60px] md:gap-[70px] md:py-[60px]">
-      <div v-if="websiteData.home.isShow" class="flex flex-col md:flex-row gap-5 mt-[50px] items-center md:items-start">
-        <img :src="websiteData.home.img" alt="" class="w-[525px]" />
+      <div v-if="websiteData.home?.isShow" class="flex flex-col md:flex-row gap-5 mt-[50px] items-center md:items-start">
+        <img :src="websiteData.home?.img" alt="" class="w-[525px]" />
         <div class="w-full md:w-[555px] flex flex-col items-center text-white gap-5 font-bold px-2.5 text-center">
-          <span class="text-[1.8rem]">{{ websiteData.home.title }}</span>
-          <span class="text-gray-400">{{ websiteData.home.sub }}</span>
+          <span class="text-[1.8rem]">{{ websiteData.home?.title }}</span>
+          <span class="text-gray-400">{{ websiteData.home?.sub }}</span>
           <p class="w-[525px] text-center">
-            {{ websiteData.home.text }}
+            {{ websiteData.home?.text }}
           </p>
           <button class="text-white bg-[#ac886b] px-10 py-1.5 rounded text-[1.1rem]">點我看設計理念</button>
         </div>
       </div>
 
 
-      <iframe class="w-full md:w-[1100px] h-auto  md:h-[562px]" :src="websiteData.home.video[0]" frameborder="0"
+      <iframe class="w-full md:w-[1100px] h-auto  md:h-[562px]" :src="websiteData.home?.video[0]" frameborder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen>
       </iframe>
     </div>
 
     <div class="w-full">
-      <img :src="websiteData.home.img[1]" alt="" class="w-full" />
-      <img :src="websiteData.home.img[2]" alt="" class="w-full" />
-      <img :src="websiteData.home.img[3]" alt="" class="w-full" />
+      <img :src="websiteData.home?.img[1]" alt="" class="w-full" />
+      <img :src="websiteData.home?.img[2]" alt="" class="w-full" />
+      <img :src="websiteData.home?.img[3]" alt="" class="w-full" />
     </div>
 
     <div class="flex flex-col items-center justify-center  my-[70px]">
       <span class="text-white  text-[1.8rem] pb-[50px]">產品特色說明</span>
-      <iframe class="w-full md:w-[1100px] h-auto md:h-[562px]" :src="websiteData.home.video[1]" frameborder="0"
+      <iframe class="w-full md:w-[1100px] h-auto md:h-[562px]" :src="websiteData.home?.video[1]" frameborder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen>
       </iframe>
     </div>
 
     <div class="w-full">
-      <img :src="websiteData.home.img[4]" alt="" class="w-full" />
+      <img :src="websiteData.home?.img[4]" alt="" class="w-full" />
     </div>
 
     <div class="flex justify-center pb-5">
