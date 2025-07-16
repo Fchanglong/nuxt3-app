@@ -7,8 +7,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   
   // 如果數據還沒加載，先加載
   if (!websiteData || Object.keys(websiteData).length === 0) {
-    console.log(process.client?'客戶端':'服務器端');
-
     await store.dispatch('website/fetchWebsiteData')
 
 }

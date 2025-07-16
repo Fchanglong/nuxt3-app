@@ -3,12 +3,9 @@ import { computed } from 'vue'
 import { useStore } from 'vuex'
 const store = useStore()
 const { data: websiteData } = await useAsyncData('footer-data', async () => {
-    console.log(store.getters['website/getWebsiteData']);
-    
     return store.getters['website/getWebsiteData']
 })
 const paymentImgUrl = computed(() => {
-
     return websiteData.value?.other.footer?.paymentIcon || []
 })
 </script>

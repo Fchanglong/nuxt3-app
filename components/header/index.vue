@@ -14,7 +14,7 @@
     <div class="main-nav">
       <!-- 左侧 Logo（桌面 & 移动都在左） -->
       <NuxtLink to="/" class="main-nav__logo">
-        <img src="/logo.png" alt="網站 Logo" />
+        <img :src="websiteLogo" alt="網站 Logo" />
       </NuxtLink>
 
       <!-- 移动端：右侧并排 “购物车 + 汉堡按钮” – <768px 时可见 -->
@@ -336,15 +336,13 @@ const closeAll = () => {
 const cartCount = computed(() => store.getters['cart/cartCount'] || 0)
 
 // 根據後臺顯示header和對應的下拉框
-const { data: getWebsiteData } = useAsyncData('header-data', async () => {
+const { data: websiteData } = useAsyncData('header-data', async () => {
   return store.getters['website/getWebsiteData']
 })
-const compare = computed(() => {
-  return getWebsiteData.value?.compare || []
-})
-const faq = computed(() => {
-  return getWebsiteData.value?.faq || []
-})
+const compare = computed(() => websiteData.value?.compare || [])
+const faq = computed(() => websiteData.value?.faq || [])
+const websiteLogo = computed(() => websiteData.value?.other?.websiteLogo || '')
+
 </script>
 
 <style scoped>

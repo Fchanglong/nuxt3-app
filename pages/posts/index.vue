@@ -7,7 +7,23 @@
   const blogs = computed(() => {
     return websiteData.value?.blogs || {}
   })
+  const { data: seoData } = await useAsyncData('blog-seo', async () => {
+    return store.getters['website/getWebsiteSeo']
+  })
 
+  useHead({
+    title: seoData.value.blog.title,
+    meta: [
+      {
+        name: 'description',
+        content: seoData.value.blog.description
+      },
+      {
+        name: 'keywords',
+        content: seoData.value.blog.keywords
+      }
+    ]
+  })
 </script>
 
 <template>
